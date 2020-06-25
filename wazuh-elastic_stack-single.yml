@@ -1,23 +1,104 @@
 ---
 - hosts: wazuh_manager_1
+  # Needs sudo because of role, unless become_method=su fixes it?
   pre_tasks:
-    - name: Update and upgrade apt packages
-      become: true
+    - name: Install sudo
       apt:
-        upgrade: yes
-        update_cache: yes
-        cache_valid_time: 86400 #One day
+        name: sudo
+        state: present
+
+    - name: Make sure we have a 'wheel' group
+      group: name=wheel
+        state=present
+
+    - name: Add root user to group wheel
+      user: name=root groups=wheel
+
+    - name: Allow wheel group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^%wheel"
+        line: "%wheel ALL=(ALL) NOPASSWD: ALL"
 
   roles:
     - role: geerlingguy.swap
-    - {role: roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager}
+    - role: roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager
+
     - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
       filebeat_output_elasticsearch_hosts: localhost:9200
-    - {role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch, elasticsearch_network_host: '0.0.0.0', single_node: true}
-    - { role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana, elasticsearch_network_host: '0.0.0.0', elasticsearch_reachable_host: 'localhost' }
+
+    - {
+        role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch,
+        elasticsearch_network_host: "0.0.0.0",
+        single_node: true,
+      }
+    - {
+        role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana,
+        elasticsearch_network_host: "0.0.0.0",
+        elasticsearch_reachable_host: "localhost",
+      }
   vars:
-    - swap_file_size_mb: '4096'
-    # - use_password: 'yes'
-    # - node_options: 
-  #   wazuh_agent_authd:
-  #     enable: true
+    - swap_file_size_mb: "4096"
+    #     Xpack Security
+    # filebeat_xpack_security: true
+    # elasticsearch_xpack_security: true
+    # generate_CA: false
+    # elasticsearch_xpack_security_user: elastic
+    # elasticsearch_xpack_security_password: elastic_pass
+    # kibana_xpack_security: true,
+    - wazuh_manager_config:
+      - vulnerability_detector:
+          enabled: "yes"
+          interval: "5m"
+          ignore_time: "6h"
+          run_on_start: "yes"
+          providers:
+            - enabled: "yes"
+              os:
+                # - 'trusty'
+                # - 'xenial'
+                - "bionic"
+              update_interval: "1h"
+              name: '"canonical"'
+            - enabled: "yes"
+              os:
+                # - 'wheezy'
+                - "stretch"
+                # - 'jessie'
+                # - 'buster'
+              update_interval: "1h"
+              name: '"debian"'
+            # - enabled: 'no'
+            #   update_from_year: '2010'
+            #   update_interval: '1h'
+            #   name: '"redhat"'
+            - enabled: "yes"
+              update_from_year: "2010"
+              update_interval: "1h"
+              name: '"nvd"'
+              # Supposedly outdated:
+            # - vuls:
+            #   disable: 'yes'
+            #   interval: '1d'
+            #   run_on_start: 'yes'
+            #   args:
+            #     - 'mincvss 5'
+            #     - 'antiquity-limit 20'
+            #     - 'updatenvd'
+            #     - 'nvd-year 2016'
+            #     - 'autoupdate'
+            # OSQuery manager
+      - osquery:
+          disable: 'no'
+          run_daemon: 'yes'
+          log_path: '/var/log/osquery/osqueryd.results.log'
+          config_path: '/etc/osquery/osquery.conf'
+          ad_labels: 'yes'
+         
+
+  become_user: root
+  # Untested: sudo not installed and root cannot sudo without being sudoers
+  # become_user: root
+  # become_method: su
+  # become_method: runas

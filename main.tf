@@ -26,7 +26,7 @@ data "scaleway_image" "debian_9_x64" {
 
 resource "scaleway_instance_server" "wazuh_manager_1" {
   type  = "DEV1-L"
-  # Bugs in Wazuh Kibana plugin with Debian 9/10
+  # Bugs in Wazuh Kibana plugin with Debian 10 but Debian 9 should also work
   image = data.scaleway_image.bionic.id
   ip_id = scaleway_instance_ip.wazuh_manager_public_ip.id
   tags = ["wazuh_manager","wazuh"]

@@ -1,0 +1,23 @@
+---
+- hosts: wazuh_manager_1
+  pre_tasks:
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+  roles:
+    - role: geerlingguy.swap
+    - {role: roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager}
+    - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
+      filebeat_output_elasticsearch_hosts: localhost:9200
+    - {role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch, elasticsearch_network_host: '0.0.0.0', single_node: true}
+    - { role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana, elasticsearch_network_host: '0.0.0.0', elasticsearch_reachable_host: 'localhost' }
+  vars:
+    - swap_file_size_mb: '4096'
+    # - use_password: 'yes'
+    # - node_options: 
+  #   wazuh_agent_authd:
+  #     enable: true

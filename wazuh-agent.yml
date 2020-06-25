@@ -1,0 +1,39 @@
+---
+# - hosts: wazuh_manager_1
+#   remote_user: root
+#   name: Gather facts from manager
+#   tasks: [ ]
+
+- hosts: wazuh_agent_1
+  pre_tasks:
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+      
+    # - debug:
+    #     msg: "{{ hostvars }}"
+
+  roles:
+    - roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent
+  vars:
+# hostvars[inventory_hostname] is sous-entendu
+    wazuh_manager_ip: "{{ groups.wazuh_manager_1 }}"
+    wazuh_managers:
+      - address: "{{ wazuh_manager_ip }}"
+        port: 1514
+        protocol: udp
+        api_port: 55000
+        api_proto: 'http'
+        api_user: ansible
+    wazuh_agent_authd:
+      # authd_pass: 'foobar'
+      registration_address: "{{ wazuh_manager_ip }}"
+      enable: true
+      port: 1515
+      ssl_agent_ca: null
+      ssl_auto_negotiate: 'no'
+      ssl_agent_cert: null
+  # debug: msg='{{ hostvars["wazuh_manager_1"].ansible_default_ipv4.address }} {{ hostvars["wazuh_manager_1"]["ansible_fqdn"] }} {{ hostvars["wazuh_manager_1"]["ansible_hostname"] }}'

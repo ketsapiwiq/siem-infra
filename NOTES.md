@@ -1,0 +1,1 @@
+TF_STATE=./ ansible-playbook wazuh-elastic_stack-single.yml --user=root

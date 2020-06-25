@@ -1,0 +1,3 @@
+---
+- import_playbook: wazuh-elastic_stack-single.yml
+- import_playbook: wazuh-agent.yml

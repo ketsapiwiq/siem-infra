@@ -1,0 +1,6 @@
+terraform.tfvars
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+
+roles/geerlingguy.swap/

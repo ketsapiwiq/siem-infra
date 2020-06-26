@@ -8,6 +8,6 @@ roles/geerlingguy.swap/
 roles/ansible-role-osquery/
 roles/ansible-win-osquery/
 
-wazuh-ansible-infra.code-workspace
+env.sh
 
 # wazuh-local.ini

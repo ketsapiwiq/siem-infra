@@ -1,5 +1,5 @@
 ---
-# - hosts: wazuh_manager_1
+# - hosts: wazuh_manager
 #   remote_user: root
 #   name: Gather facts from manager
 #   tasks: [ ]
@@ -36,7 +36,7 @@
 
   vars:
     # hostvars[inventory_hostname] is sous-entendu
-    wazuh_manager_ip: "{{ hostvars[inventory_hostname].groups.wazuh_manager_1[0] }}"
+    wazuh_manager_ip: "{{ hostvars[inventory_hostname].groups.wazuh_manager[0] }}"
     wazuh_managers:
       - address: "{{ wazuh_manager_ip }}"
         port: 1514
@@ -57,7 +57,6 @@
       syscollector:
         disable: "no"
         interval: "10m"
-        win_hotfixes: "yes"
       # OSQuery agent
       osquery:
         disable: "no"
@@ -65,7 +64,7 @@
         log_path: "/var/log/osquery/osqueryd.results.log"
         config_path: "/etc/osquery/osquery.conf"
         add_labels: "yes"
-  # debug: msg='{{ hostvars["wazuh_manager_1"].ansible_default_ipv4.address }} {{ hostvars["wazuh_manager_1"]["ansible_fqdn"] }} {{ hostvars["wazuh_manager_1"]["ansible_hostname"] }}'
+  # debug: msg='{{ hostvars["wazuh_manager"].ansible_default_ipv4.address }} {{ hostvars["wazuh_manager"]["ansible_fqdn"] }} {{ hostvars["wazuh_manager"]["ansible_hostname"] }}'
 
 # OSQuery Role
 # merge strategy required

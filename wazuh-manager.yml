@@ -1,65 +1,25 @@
 ---
-- hosts: wazuh_manager_1
+- hosts: wazuh_manager
   # Needs sudo because of role, unless become_method=su fixes it?
   pre_tasks:
-    - name: Update apt packages
+    - name: Update apt packages (Ubuntu)
       become: true
       apt:
         # upgrade: yes
         update_cache: yes
         cache_valid_time: 86400 #One day
-    # due to ubuntu
-    - name: Install sudo
-      apt:
-        name: sudo
-        state: present
+      when: ansible_os_family == "Debian"
 
-    - name: Make sure we have a 'wheel' group
-      group: name=wheel
-        state=present
-
-    - name: Add root user to group wheel
-      user: name=root groups=wheel
-
-    - name: Allow wheel group to have passwordless sudo
-      lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: "^%wheel"
-        line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+    - name: Update apt packages (CentOS)
+      become: true
+      yum:
+        # upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
 
   roles:
-    - role: geerlingguy.swap
     - role: roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager
-    # - role: geerlingguy.ntp
-    - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
-      filebeat_output_elasticsearch_hosts: localhost:9200
-
-    - {
-        role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch,
-        elasticsearch_network_host: "0.0.0.0",
-        single_node: true,
-      }
-    - {
-        role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana,
-        elasticsearch_network_host: "0.0.0.0",
-        elasticsearch_reachable_host: "localhost",
-      }
   vars:
-    wazuh_api_credentials:
-        - id: "default"
-          url: "https://localhost"
-          port: 55000
-          user: "foo"
-          password: "bar"
-    swap_file_size_mb: "4096"
-    #     Xpack Security
-    # filebeat_xpack_security: true
-    # elasticsearch_xpack_security: true
-    # generate_CA: false
-    # elasticsearch_xpack_security_user: elastic
-    # elasticsearch_xpack_security_password: elastic_pass
-    # kibana_xpack_security: true,
     wazuh_manager_config:
       api:
         https: 'yes'
@@ -110,8 +70,6 @@
         log_path: "/var/log/osquery/osqueryd.results.log"
         config_path: "/etc/osquery/osquery.conf"
         ad_labels: "yes"
-      # ntp_timezone: Etc/UTC
-      # ntp_enabled: true
 
   become_user: root
   # Untested: sudo not installed and root cannot sudo without being sudoers

@@ -1,0 +1,72 @@
+---
+- hosts: wazuh_manager
+  # Needs sudo because of role, unless become_method=su fixes it?
+  pre_tasks:
+    - name: Update apt packages (Ubuntu)
+      become: true
+      apt:
+        # upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+      when: ansible_os_family == "Debian"
+
+    - name: Update apt packages (CentOS)
+      become: true
+      yum:
+        # upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    # due to ubuntu and ansible role, install and configure sudo for root
+    - name: Install sudo
+      apt:
+        name: sudo
+        state: present
+      when: ansible_distribution == "Ubuntu"
+    - name: Make sure we have a 'wheel' group
+      group: name=wheel
+        state=present
+      when: ansible_distribution == "Ubuntu"
+    - name: Add root user to group wheel
+      user: name=root groups=wheel
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Allow wheel group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^%wheel"
+        line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+      when: ansible_distribution == "Ubuntu"
+
+  roles:
+    - role: geerlingguy.swap
+    - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
+      filebeat_output_elasticsearch_hosts: localhost:9200
+
+    - {
+        role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch,
+        elasticsearch_network_host: "0.0.0.0",
+        single_node: true,
+      }
+    - {
+        role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana,
+        elasticsearch_network_host: "0.0.0.0",
+        elasticsearch_reachable_host: "localhost",
+      }
+  vars:
+    swap_file_size_mb: "4096"
+    #     Xpack Security
+    # filebeat_xpack_security: true
+    # elasticsearch_xpack_security: true
+    # generate_CA: false
+    # elasticsearch_xpack_security_user: elastic
+    # elasticsearch_xpack_security_password: elastic_pass
+    # kibana_xpack_security: true,
+   
+
+  become_user: root
+  # Untested: sudo not installed and root cannot sudo without being sudoers
+  # become_user: root
+  # become_method: su
+  # become_method: runas

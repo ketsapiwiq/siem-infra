@@ -1,9 +1,12 @@
 ---
-- hosts: wazuh_agent_win_local
+- hosts: wazuh_agent_win
   pre_tasks:
-    - name: debug manager IP
+    # - name: debug manager IP
+    # debug:
+    # msg: "{{wazuh_manager_ip}}"
+    - name: show ossec conf templating results
       debug:
-        msg: "{{wazuh_manager_ip}}" 
+        msg: "{{ lookup('template', './roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent/templates/var-ossec-etc-ossec-agent.conf.j2') }}"
 
   roles:
     - roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent
@@ -18,40 +21,38 @@
         type: dword
 
   vars:
-      wazuh_manager_ip: "{{ groups.wazuh_manager_local[0] }}"
-      wazuh_managers:
-        - address: "{{ wazuh_manager_ip }}"
-          port: 1514
-          protocol: udp
-          api_port: 55000
-          api_proto: "http"
-          api_user: foo
-          api_pass: bar
-      wazuh_agent_authd:
-        # authd_pass: 'foobar'
-        registration_address: "{{ wazuh_manager_ip }}"
-        enable: true
-        port: 1515
-        ssl_agent_ca: null
-        ssl_auto_negotiate: "no"
-        ssl_agent_cert: null
-      wazuh_agent_config:
-        syscollector:
-          disable: no
-          # Needed for windows, apparently not in template
-          # hotfixes: yes
-
+    wazuh_manager_ip: "{{ groups.wazuh_manager[0] }}"
+    wazuh_managers:
+      - address: "{{ wazuh_manager_ip }}"
+        port: 1514
+        protocol: udp
+        api_port: 55000
+        api_proto: "http"
+        api_user: foo
+        api_pass: bar
+    wazuh_agent_authd:
+      # authd_pass: 'foobar'
+      registration_address: "{{ wazuh_manager_ip }}"
+      enable: true
+      port: 1515
+      ssl_agent_ca: null
+      ssl_auto_negotiate: "no"
+      ssl_agent_cert: null
+    wazuh_agent_config:
+      syscollector:
+        disable: no
+        # Needed for windows
+        win_hotfixes: yes
+        interval: 10m
 ### OSQUERY
-# TODO: Install osquery
 # Wazuh OSquery config
-    # osquery:
-    # disable: 'no'
-    # run_daemon: 'yes'
-    # bin_path_win: 'C:\Program Files\osquery\osqueryd'
-    # log_path_win: 'C:\Program Files\osquery\log\osqueryd.results.log'
-    # config_path_win: 'C:\Program Files\osquery\osquery.conf'
-    # add_labels: 'yes'
-
+      osquery:
+        disable: 'no'
+        run_daemon: 'yes'
+        bin_path_win: 'C:\Program Files\osquery\osqueryd'
+        log_path_win: 'C:\Program Files\osquery\log\osqueryd.results.log'
+        config_path_win: 'C:\Program Files\osquery\osquery.conf'
+        add_labels: 'yes'
 
 # OSQuery Role
 # See roles/ansible-win-osquery/defaults/main.yml

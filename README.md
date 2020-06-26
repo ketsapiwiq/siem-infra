@@ -12,12 +12,13 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 3. `terraform apply`
 4. Install Ansible Terraform dynamic inventory binary at [adammck/terraform-inventory](https://github.com/adammck/terraform-inventory)
 5. Set some variable due to a plugin issue: `export TF_STATE=./;` (see https://github.com/adammck/terraform-inventory/issues/144)
-5. Run: `TF_STATE=./ wazuh-manager-single-node.yml wazuh-agent.yml`
+5. Run: `TF_STATE=./ wazuh-tf-single-node.yml wazuh-manager.yml wazuh-agent.yml`
 
 ### With VirtualBox
 1. Import the [Wazuh VM](https://documentation.wazuh.com/3.13/installation-guide/virtual-machine.html)
 2. Adapt the `wazuh-local.ini` inventory according to your network settings and desires
 3. Set some variables, e.g.: `export ANSIBLE_HOST_KEY_CHECKING=False;`
+1. Run: `ansible-playbook wazuh-vm-single-node.yml wazuh-manager.yml -i wazuh-local.ini`
 
 #### Enroll the Linux agent
 1. `ansible-playbook wazuh-agent.yml -i wazuh-local.ini`

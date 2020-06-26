@@ -1,0 +1,37 @@
+---
+- hosts: wazuh_manager
+  # gather_facts: False
+
+
+#   pre_tasks:
+# # TODO: inject SSH key and disable password
+#     - name: Check for Python
+#       raw: test -e /usr/bin/python
+#       changed_when: false
+#       failed_when: false
+#       register: check_python
+
+#     - name: Install Python
+#       raw: yum -y install python3
+#       when: check_python.rc != 0
+
+  #   - name: Update apt packages
+  #     become: true
+  #     yum:
+  #       # upgrade: yes
+  #       update_cache: yes
+
+  roles:
+    - role: geerlingguy.ntp
+    - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
+    # Not working, package conflicts:
+    # - role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch
+    # - role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana
+  vars:
+    elastic_stack_version: 7.7.1
+    elasticsearch_network_host: "0.0.0.0"
+    elasticsearch_reachable_host: "localhost"
+    filebeat_output_elasticsearch_hosts: localhost:9200
+    single_node: true
+    ntp_timezone: Etc/UTC
+    ntp_enabled: true

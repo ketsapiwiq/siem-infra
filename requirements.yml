@@ -1,5 +1,6 @@
 # from galaxy
 - src: geerlingguy.swap
+- src: geerlingguy.ntp
 
 # from GitHub
 # - src: https://github.com/wazuh/wazuh-ansible

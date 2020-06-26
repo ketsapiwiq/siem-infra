@@ -24,7 +24,7 @@ data "scaleway_image" "debian_9_x64" {
   name         = "Debian Stretch"
 }
 
-resource "scaleway_instance_server" "wazuh_manager_1" {
+resource "scaleway_instance_server" "wazuh_manager" {
   type  = "DEV1-L"
   # Bugs in Wazuh Kibana plugin with Debian 10 but Debian 9 should also work
   image = data.scaleway_image.bionic.id

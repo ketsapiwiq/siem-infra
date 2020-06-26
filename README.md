@@ -6,26 +6,52 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 ### With Terraform
 1. Set your `terraform.tfvars`
 2. Install Terraform plugin for your cloud provider
+**_Careful: no firewall has been setup, your Terraform servers are listening on a public IP by default with NO KIBANA or ELASTIC AUTHENTICATION_**
 3. `terraform apply`
 4. Install Ansible Terraform dynamic inventory binary at [github.com/adammck/terraform-inventory](https://github.com/adammck/terraform-inventory)
-5. Set some variables: `export TF_STATE=./;` (see https://github.com/adammck/terraform-inventory/issues/144)
+5. Set some variable due to a plugin issue: `export TF_STATE=./;` (see https://github.com/adammck/terraform-inventory/issues/144)
+5. Run: `TF_STATE=./ wazuh-manager-single-node.yml wazuh-agent.yml`
 
 ### With VirtualBox
 1. Import the [Wazuh VM](https://documentation.wazuh.com/3.13/installation-guide/virtual-machine.html)
-2. Adapt inventory according to your network settings and desires
+2. Adapt the `wazuh-local.ini` inventory according to your network settings and desires
+3. Set some variables, e.g.: `export ANSIBLE_HOST_KEY_CHECKING=False;`
 
-### Run
+#### Enroll the Linux agent
+1. `ansible-playbook wazuh-agent.yml -i wazuh-local.ini`
 
-1. Set some variables, e.g.: `export ANSIBLE_HOST_KEY_CHECKING=False; export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` _(on MacOS, see https://github.com/ansible/ansible/issues/32499)
-5. Run: `ansible-playbook wazuh-both.yml`
+####  Enroll the Windows agent
+1. Setup a WinRM-reachable Windows environment in the Ansible inventory `wazuh-local.ini`
+1. Run: `ansible-playbook wazuh-agent-win.yml -i wazuh-local.ini -k`
+(on MacOS Cataline, do `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` before, see Bugs below)
+
 
 ## TODO
+* Troubleshoot vulnerability detection bug
+* Setup X-pack auth config + HTTPS/TLS certs everywhere
+* Vulnerability detection with hotfixes on Windows
 * [Active response](https://documentation.wazuh.com/3.13/user-manual/capabilities/active-response/how-it-works.html#when-is-an-active-response-triggered)
+
+### Possible evolutions
+* VirusTotal API / [Malice](https://github.com/maliceio/malice) / Cuckoo integration
+* Suricata integration
 * Multi-cluster / load-balanced Ansible playbook
   * K8s/Helm ?
-* Suricata integration
-* VirusTotal / [Malice](https://github.com/maliceio/malice) / Cuckoo integration
 
-## See also
-https://documentation.wazuh.com/3.13/user-manual/capabilities/vulnerability-detection/index.html#vulnerability-detection
-https://documentation.wazuh.com/3.13/user-manual/capabilities/osquery.html
+### Low priority
+* more robust osquery configuration for Linux? https://github.com/palantir/osquery-configuration
+
+## Bugs
+On MacOS Catalina, if you get:
+```
+objc[11628]: +[NSNumber initialize] may have been in progress in another thread when fork() was called.
+objc[11628]: +[NSNumber initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
+ERROR! A worker was found in a dead state
+```
+
+You need to set some variable: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
+See https://github.com/ansible/ansible/issues/32499
+
+## External documentation
+- https://documentation.wazuh.com/3.13/user-manual/capabilities/vulnerability-detection/index.html#vulnerability-detection
+- https://documentation.wazuh.com/3.13/user-manual/capabilities/osquery.html

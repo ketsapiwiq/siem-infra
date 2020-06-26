@@ -2,6 +2,13 @@
 - hosts: wazuh_manager_1
   # Needs sudo because of role, unless become_method=su fixes it?
   pre_tasks:
+    - name: Update apt packages
+      become: true
+      apt:
+        # upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+    # due to ubuntu
     - name: Install sudo
       apt:
         name: sudo
@@ -39,7 +46,13 @@
         elasticsearch_reachable_host: "localhost",
       }
   vars:
-    - swap_file_size_mb: "4096"
+    wazuh_api_credentials:
+        - id: "default"
+          url: "https://localhost"
+          port: 55000
+          user: "foo"
+          password: "bar"
+    swap_file_size_mb: "4096"
     #     Xpack Security
     # filebeat_xpack_security: true
     # elasticsearch_xpack_security: true
@@ -47,55 +60,56 @@
     # elasticsearch_xpack_security_user: elastic
     # elasticsearch_xpack_security_password: elastic_pass
     # kibana_xpack_security: true,
-    - wazuh_manager_config:
-      - vulnerability_detector:
-          enabled: "yes"
-          interval: "5m"
-          ignore_time: "6h"
-          run_on_start: "yes"
-          providers:
-            - enabled: "yes"
-              os:
-                # - 'trusty'
-                # - 'xenial'
-                - "bionic"
-              update_interval: "1h"
-              name: '"canonical"'
-            - enabled: "yes"
-              os:
-                # - 'wheezy'
-                - "stretch"
-                # - 'jessie'
-                # - 'buster'
-              update_interval: "1h"
-              name: '"debian"'
-            # - enabled: 'no'
-            #   update_from_year: '2010'
-            #   update_interval: '1h'
-            #   name: '"redhat"'
-            - enabled: "yes"
-              update_from_year: "2010"
-              update_interval: "1h"
-              name: '"nvd"'
-              # Supposedly outdated:
-            # - vuls:
-            #   disable: 'yes'
-            #   interval: '1d'
-            #   run_on_start: 'yes'
-            #   args:
-            #     - 'mincvss 5'
-            #     - 'antiquity-limit 20'
-            #     - 'updatenvd'
-            #     - 'nvd-year 2016'
-            #     - 'autoupdate'
-            # OSQuery manager
-      - osquery:
-          disable: 'no'
-          run_daemon: 'yes'
-          log_path: '/var/log/osquery/osqueryd.results.log'
-          config_path: '/etc/osquery/osquery.conf'
-          ad_labels: 'yes'
-         
+    wazuh_manager_config:
+      api:
+        https: 'yes'
+      vulnerability_detector:
+        enabled: "yes"
+        interval: "5m"
+        ignore_time: "6h"
+        run_on_start: "yes"
+        providers:
+          - enabled: "yes"
+            os:
+              # - 'trusty'
+              # - 'xenial'
+              - "bionic"
+            update_interval: "1h"
+            name: '"canonical"'
+          - enabled: "yes"
+            os:
+              # - 'wheezy'
+              - "stretch"
+              # - 'jessie'
+              # - 'buster'
+            update_interval: "1h"
+            name: '"debian"'
+          # - enabled: 'no'
+          #   update_from_year: '2010'
+          #   update_interval: '1h'
+          #   name: '"redhat"'
+          - enabled: "yes"
+            update_from_year: "2010"
+            update_interval: "1h"
+            name: '"nvd"'
+            # Supposedly outdated:
+          # - vuls:
+          #   disable: 'yes'
+          #   interval: '1d'
+          #   run_on_start: 'yes'
+          #   args:
+          #     - 'mincvss 5'
+          #     - 'antiquity-limit 20'
+          #     - 'updatenvd'
+          #     - 'nvd-year 2016'
+          #     - 'autoupdate'
+          # OSQuery manager
+      osquery:
+        disable: "no"
+        run_daemon: "yes"
+        log_path: "/var/log/osquery/osqueryd.results.log"
+        config_path: "/etc/osquery/osquery.conf"
+        ad_labels: "yes"
 
   become_user: root
   # Untested: sudo not installed and root cannot sudo without being sudoers

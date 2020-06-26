@@ -1,0 +1,7 @@
+# from galaxy
+- src: geerlingguy.swap
+
+# from GitHub
+- src: https://github.com/wazuh/wazuh-ansible
+# see also apolloclark repo
+- src: https://github.com/shamsalmon/ansible-role-osquery

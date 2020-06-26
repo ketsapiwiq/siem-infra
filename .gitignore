@@ -5,3 +5,5 @@ terraform.tfstate.backup
 .terraform.tfstate.lock.info
 
 roles/geerlingguy.swap/
+roles/ansible-role-osquery/
+# wazuh-local.ini

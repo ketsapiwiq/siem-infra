@@ -21,7 +21,7 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 5. Run: `ansible-playbook wazuh-both.yml`
 
 ## TODO
-* Active response
+* [Active response](https://documentation.wazuh.com/3.13/user-manual/capabilities/active-response/how-it-works.html#when-is-an-active-response-triggered)
 * Multi-cluster / load-balanced Ansible playbook
   * K8s/Helm ?
 * Suricata integration

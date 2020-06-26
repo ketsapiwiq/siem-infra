@@ -12,8 +12,7 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 
 ### With VirtualBox
 1. Import the [Wazuh VM](https://documentation.wazuh.com/3.13/installation-guide/virtual-machine.html)
-2. Adapt inventory according to your network settings
-3. ??? (playbooks not tested on CentOS)
+2. Adapt inventory according to your network settings and desires
 
 ### Run
 

@@ -54,6 +54,8 @@
       ssl_auto_negotiate: "no"
       ssl_agent_cert: null
     wazuh_agent_config:
+      syscollector:
+        disable: "no"
       # OSQuery agent
       osquery:
         disable: "no"

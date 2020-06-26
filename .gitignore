@@ -7,4 +7,7 @@ terraform.tfstate.backup
 roles/geerlingguy.swap/
 roles/ansible-role-osquery/
 roles/ansible-win-osquery/
+
+wazuh-ansible-infra.code-workspace
+
 # wazuh-local.ini

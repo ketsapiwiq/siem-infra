@@ -1,1 +1,1 @@
-1. Why is ossec-agent in Program Files (x86)? Wasn't it important to be x64?
+1. Why is ossec-agent in Program Files (x86)? Wasn't it important to be x64gi?

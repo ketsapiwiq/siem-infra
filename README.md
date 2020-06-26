@@ -29,7 +29,8 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 
 
 ## TODO
-* Troubleshoot vulnerability detection bug
+* Troubleshoot Windows OSSEC service
+* Troubleshoot vulnerability detection bug with Linux agent
 * Setup X-pack auth config + HTTPS/TLS certs everywhere
 * Vulnerability detection with hotfixes on Windows
 * [Active response](https://documentation.wazuh.com/3.13/user-manual/capabilities/active-response/how-it-works.html#when-is-an-active-response-triggered)
@@ -43,7 +44,10 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 ### Low priority
 * more robust osquery configuration for Linux? https://github.com/palantir/osquery-configuration
 
-## Bugs
+## Known issues
+`Get-Service OssecSvc` on Windows hosts show service is stopped after playbook.
+
+## Workarounds
 On MacOS Catalina, if you get:
 ```
 objc[11628]: +[NSNumber initialize] may have been in progress in another thread when fork() was called.
@@ -53,6 +57,8 @@ ERROR! A worker was found in a dead state
 
 You need to set some variable: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
 See https://github.com/ansible/ansible/issues/32499
+
+
 
 ## External documentation
 - https://documentation.wazuh.com/3.13/user-manual/capabilities/vulnerability-detection/index.html#vulnerability-detection

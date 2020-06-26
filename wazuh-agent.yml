@@ -57,6 +57,7 @@
       syscollector:
         disable: "no"
         interval: "10m"
+        win_hotfixes: "yes"
       # OSQuery agent
       osquery:
         disable: "no"

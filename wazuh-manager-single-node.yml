@@ -31,7 +31,7 @@
   roles:
     - role: geerlingguy.swap
     - role: roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager
-
+    # - role: geerlingguy.ntp
     - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
       filebeat_output_elasticsearch_hosts: localhost:9200
 
@@ -110,6 +110,8 @@
         log_path: "/var/log/osquery/osqueryd.results.log"
         config_path: "/etc/osquery/osquery.conf"
         ad_labels: "yes"
+      # ntp_timezone: Etc/UTC
+      # ntp_enabled: true
 
   become_user: root
   # Untested: sudo not installed and root cannot sudo without being sudoers

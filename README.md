@@ -4,11 +4,13 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 
 ## Run
 ### With Terraform
+
+**_Careful: no firewall has been setup, your Terraform servers are listening on a public IP by default with NO KIBANA or ELASTIC AUTHENTICATION_**
+
 1. Set your `terraform.tfvars`
 2. Install Terraform plugin for your cloud provider
-**_Careful: no firewall has been setup, your Terraform servers are listening on a public IP by default with NO KIBANA or ELASTIC AUTHENTICATION_**
 3. `terraform apply`
-4. Install Ansible Terraform dynamic inventory binary at [github.com/adammck/terraform-inventory](https://github.com/adammck/terraform-inventory)
+4. Install Ansible Terraform dynamic inventory binary at [adammck/terraform-inventory](https://github.com/adammck/terraform-inventory)
 5. Set some variable due to a plugin issue: `export TF_STATE=./;` (see https://github.com/adammck/terraform-inventory/issues/144)
 5. Run: `TF_STATE=./ wazuh-manager-single-node.yml wazuh-agent.yml`
 

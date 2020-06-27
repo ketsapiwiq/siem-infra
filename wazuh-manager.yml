@@ -80,6 +80,12 @@
 # TODO: sysmon rules for powershell cmds
 # https://documentation.wazuh.com/3.9/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html
 
+# <rule id="100000" level="12">
+#   <if_sid>4104</if_sid>
+#   <description>Powershell command run</description>
+# </rule>
+
+
 # <group name="sysmon,">
 #  <rule id="255000" level="12">
 #  <if_group>sysmon_event1</if_group>

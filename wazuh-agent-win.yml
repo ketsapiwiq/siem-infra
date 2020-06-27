@@ -4,9 +4,9 @@
     # - name: debug manager IP
     # debug:
     # msg: "{{wazuh_manager_ip}}"
-    - name: show ossec conf templating results
-      debug:
-        msg: "{{ lookup('template', './roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent/templates/var-ossec-etc-ossec-agent.conf.j2') }}"
+    # - name: show ossec conf templating results
+    #   debug:
+    #     msg: "{{ lookup('template', './roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent/templates/var-ossec-etc-ossec-agent.conf.j2') }}"
 
   roles:
     - roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent
@@ -27,10 +27,10 @@
         type: dword
     - name: Enable module logging for powershell command logging
       win_regedit:
-        path: HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging
-        name: ModuleNames
-        # path: HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames
-        # name: '*'
+        # path: HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging
+        # name: ModuleNames
+        path: HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames
+        name: '*'
         data: '*'
         type: string
     - name: Enable powershell command transcription
@@ -91,8 +91,16 @@
       localfiles:
         windows:
         - format: 'eventchannel'
-          location: 'Microsoft-Windows-Sysmon/Operational'
+          location: 'Microsoft-Windows-Powershell/Operational'
+          # location: 'Windows PowerShell'
+          query: 'Event/System[EventID=4104]'
+          # 4100 and 4103 should be helpful too
+        # - format: 'eventchannel'
+        #   location: 'Microsoft-Windows-Powershell/Operational'
+        #   query: 'Event/System[EventID=4103]'
 # https://documentation.wazuh.com/3.9/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html
+# https://static1.squarespace.com/static/552092d5e4b0661088167e5c/t/59c1814829f18782e24f1fe2/1505853768977/Windows+PowerShell+Logging+Cheat+Sheet+ver+Sept+2017+v2.1.pdf
+# Windows 8.1and Server 2012and above:oPowerShellversion 3 and4, “Windows PowerShell” log-Event ID’s 400, 500, 501 and 800o“Microsoft-Windows-PowerShell/Operational”log –Event ID4104Windows 7 and Server 2008 and above:oPowerShellversion 5, “Windows PowerShell” log-Event ID’s 200, 400, 500and 501o“Microsoft-Windows-PowerShell/Operational”log –Event ID4100, 4103 and 410
 
 # OSQuery Role
 # See roles/ansible-win-osquery/defaults/main.yml

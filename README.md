@@ -30,7 +30,8 @@ Vulnerability detection, OSquery, fully-fledged Wazuh ELK stack with Linux and W
 
 
 ## TODO
-* Troubleshoot Windows OSSEC service
+* Troubleshoot Windows osquery bugs
+* Add Powershell command execution logging and alerting
 * Troubleshoot vulnerability detection bug with Linux agent
 * Setup X-pack auth config + HTTPS/TLS certs everywhere
 * Vulnerability detection with hotfixes on Windows
@@ -64,3 +65,4 @@ See https://github.com/ansible/ansible/issues/32499
 ## External documentation
 - https://documentation.wazuh.com/3.13/user-manual/capabilities/vulnerability-detection/index.html#vulnerability-detection
 - https://documentation.wazuh.com/3.13/user-manual/capabilities/osquery.html
+- https://documentation.wazuh.com/3.13/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html

@@ -34,7 +34,7 @@ resource "scaleway_instance_server" "wazuh_manager" {
 }
 
 
-resource "scaleway_instance_server" "wazuh_agent_1" {
+resource "scaleway_instance_server" "wazuh_agent" {
   type  = "DEV1-S"
   image = data.scaleway_image.debian_9_x64.id
   ip_id = scaleway_instance_ip.wazuh_agent_public_ip.id

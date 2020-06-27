@@ -4,7 +4,7 @@
 #   name: Gather facts from manager
 #   tasks: [ ]
 
-- hosts: wazuh_agent_1
+- hosts: wazuh_agent
   pre_tasks:
     - name: Update apt packages
       # become: true
@@ -57,6 +57,7 @@
       syscollector:
         disable: "no"
         interval: "10m"
+        os: 'yes'
       # OSQuery agent
       osquery:
         disable: "no"
@@ -66,13 +67,7 @@
         add_labels: "yes"
   # debug: msg='{{ hostvars["wazuh_manager"].ansible_default_ipv4.address }} {{ hostvars["wazuh_manager"]["ansible_fqdn"] }} {{ hostvars["wazuh_manager"]["ansible_hostname"] }}'
 
-# OSQuery Role
-# merge strategy required
-
-    # osquery:
-    #   config_include_dir: "/etc/osquery"
-    #   logger_path: "/var/log/osquery"
-
+    # osquery role vars (merge)
     osquery_config:
       options:
         config_plugin: filesystem

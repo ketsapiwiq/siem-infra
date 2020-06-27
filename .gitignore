@@ -4,7 +4,12 @@ terraform.tfstate.backup
 .terraform/
 .terraform.tfstate.lock.info
 
-roles/
+roles/geerlingguy.swap/
+roles/ansible-role-osquery/
+roles/ansible-win-osquery/
+roles/geerlingguy.ntp/
+
+
 
 .env
 

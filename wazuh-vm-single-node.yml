@@ -2,18 +2,19 @@
 - hosts: wazuh_manager
   # gather_facts: False
 
+  #   pre_tasks:
+  # # TODO: inject SSH key and disable password
+  #     - name: Check for Python
+  #       raw: test -e /usr/bin/python
+  #       changed_when: false
+  #       failed_when: false
+  #       register: check_python
 
-#   pre_tasks:
-# # TODO: inject SSH key and disable password
-#     - name: Check for Python
-#       raw: test -e /usr/bin/python
-#       changed_when: false
-#       failed_when: false
-#       register: check_python
-
-#     - name: Install Python
-#       raw: yum -y install python3
-#       when: check_python.rc != 0
+  #     - name: Install Python
+  #       raw: yum -y install python3
+  #       when: check_python.rc != 0
+  #   - name: Gathering facts
+  #       setup:
 
   #   - name: Update apt packages
   #     become: true
@@ -33,5 +34,5 @@
     elasticsearch_reachable_host: "localhost"
     filebeat_output_elasticsearch_hosts: localhost:9200
     single_node: true
-    ntp_timezone: Etc/UTC
+    ntp_timezone: "Europe/Paris"
     ntp_enabled: true

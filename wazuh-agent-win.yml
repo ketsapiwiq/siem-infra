@@ -1,12 +1,28 @@
 ---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: launches a vm on the ansible host
+      command: 'VBoxManage startvm "Ansible Wazuh Agent Windows Server 2012 R2"'
+      register: startvm_result
+      failed_when: '"VBoxManage: error" in startvm_result.stderr and not "already locked by a session" in startvm_result.stderr'
+      changed_when: 'not "already locked by a session" in startvm_result.stderr'
 - hosts: wazuh_agent_win
   pre_tasks:
-    # - name: debug manager IP
     # debug:
-    # msg: "{{wazuh_manager_ip}}"
+    # - name: debug manager IP
+    #   msg: "{{wazuh_manager_ip}}"
+    # debug:
     # - name: show ossec conf templating results
-    #   debug:
-    #     msg: "{{ lookup('template', './roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent/templates/var-ossec-etc-ossec-agent.conf.j2') }}"
+    #   msg: "{{ lookup('template', './roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent/templates/var-ossec-etc-ossec-agent.conf.j2') }}"
+
+    # debug:
+    - name: install sysinternals
+      win_chocolatey:
+        state: present
+        name: "sysinternals"
+
 
   roles:
     - roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent
@@ -77,6 +93,8 @@
         # Needed for windows
         win_hotfixes: 'yes'
         interval: 10m
+    wazuh_winagent_config:
+      keep_downloaded_package: True
 ### OSQUERY
 # Wazuh OSquery config
       osquery:
@@ -90,10 +108,21 @@
 # Sysmon events
       localfiles:
         windows:
+        # - format: 'eventchannel'
+        #   location: 'Microsoft-Windows-Sysmon/Operational'
         - format: 'eventchannel'
           location: 'Microsoft-Windows-Powershell/Operational'
           # location: 'Windows PowerShell'
-          query: 'Event/System[EventID=4104]'
+          query: 'Event/System[EventID=4104 or EventID=4100 or EventID=4103]'
+        - format: 'eventlog'
+          location: 'Microsoft-Windows-Powershell/Operational'
+          # location: 'Windows PowerShell'
+          query: 'Event/System[EventID=4104 or EventID=4100 or EventID=4103]'
+        - format: 'eventlog'
+          # location: 'Microsoft-Windows-Powershell/Operational'
+          location: 'Windows PowerShell'
+          query: 'Event/System[EventID=4104 or EventID=4100 or EventID=4103]'
+          # query: 'Event/System[EventID=4104]'
           # 4100 and 4103 should be helpful too
         # - format: 'eventchannel'
         #   location: 'Microsoft-Windows-Powershell/Operational'
@@ -105,3 +134,4 @@
 # OSQuery Role
 # See roles/ansible-win-osquery/defaults/main.yml
 # And config given by wazuh (originally json)
+

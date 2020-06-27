@@ -19,8 +19,14 @@
 
   roles:
     - role: roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager
+    - role: roles/ansible-role-osquery
+    
   vars:
     wazuh_manager_config:
+    # Debug mode: normally, wazuh-manager discards logs sent that don't trigger an alert
+      logall: 'yes'
+      # logall_json: 'no'
+
       api:
         https: 'yes'
       vulnerability_detector:
@@ -70,6 +76,22 @@
         log_path: "/var/log/osquery/osqueryd.results.log"
         config_path: "/etc/osquery/osquery.conf"
         ad_labels: "yes"
+
+    
+    # osquery role vars (merge)
+    osquery_config:
+      options:
+        config_plugin: filesystem
+        logger_plugin: filesystem
+        utc: 'true'
+      packs:
+        osquery-monitoring: "/usr/share/osquery/packs/osquery-monitoring.conf"
+        incident-response: "/usr/share/osquery/packs/incident-response.conf"
+        it-compliance: "/usr/share/osquery/packs/it-compliance.conf"
+        vuln-management: "/usr/share/osquery/packs/vuln-management.conf"
+        hardware-monitoring: "/usr/share/osquery/packs/hardware-monitoring.conf"
+        ossec-rootkit: "/usr/share/osquery/packs/ossec-rootkit.conf"
+
 
   become_user: root
   # Untested: sudo not installed and root cannot sudo without being sudoers
@@ -123,3 +145,8 @@
 #     <field name="win.system.eventID">^11707$|^1033$</field>
       # <description>Application Installed $(win.eventdata.data)</description>
 # </rule>
+
+
+# TODO:
+# include play-level rules template file if exists:
+#  src: "{{ vhost_template_file|default('vhost.conf.j2') }}"

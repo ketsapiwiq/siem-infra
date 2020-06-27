@@ -1,0 +1,8 @@
+# file must be named vbox.yaml or vbox.yml
+simple_config_file:
+    plugin: virtualbox
+    settings_password_file: /etc/virtualbox/secrets
+    query:
+      logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
+    compose:
+      ansible_connection: ('Windows' in vbox_Guest_OS)|ternary('winrm', 'ssh')

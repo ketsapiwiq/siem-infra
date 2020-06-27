@@ -1,4 +1,14 @@
 ---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: launches a vm on the ansible host
+      command: 'VBoxManage startvm "vm_wazuh"'
+      register: startvm_result
+      failed_when: '"VBoxManage: error" in startvm_result.stderr and not "already locked by a session" in startvm_result.stderr'
+      changed_when: 'not "already locked by a session" in startvm_result.stderr'
+
 - hosts: wazuh_manager
   # gather_facts: False
 

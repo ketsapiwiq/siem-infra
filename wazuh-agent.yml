@@ -15,20 +15,20 @@
 
   # - debug:
   #     msg: "{{ groups }}"
-  
+
   # OSQuery
-  # tasks: 
+  # tasks:
   # apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $OSQUERY_KEY
 
-# add-apt-repository 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
+  # add-apt-repository 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
 
-# apt-get update
+  # apt-get update
 
-# apt-get install osquery
+  # apt-get install osquery
 
-# Once installed, you will need a configuration file for Osquery. If you don’t have any, you can use the following one provided by Osquery:
+  # Once installed, you will need a configuration file for Osquery. If you don’t have any, you can use the following one provided by Osquery:
 
-# cp /usr/share/osquery/osquery.example.conf /etc/osquery/osquery.conf
+  # cp /usr/share/osquery/osquery.example.conf /etc/osquery/osquery.conf
 
   roles:
     - roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent
@@ -57,7 +57,7 @@
       syscollector:
         disable: "no"
         interval: "10m"
-        os: 'yes'
+        os: "yes"
       # OSQuery agent
       osquery:
         disable: "no"
@@ -65,25 +65,27 @@
         log_path: "/var/log/osquery/osqueryd.results.log"
         config_path: "/etc/osquery/osquery.conf"
         add_labels: "yes"
-  # debug: msg='{{ hostvars["wazuh_manager"].ansible_default_ipv4.address }} {{ hostvars["wazuh_manager"]["ansible_fqdn"] }} {{ hostvars["wazuh_manager"]["ansible_hostname"] }}'
+    # debug: msg='{{ hostvars["wazuh_manager"].ansible_default_ipv4.address }} {{ hostvars["wazuh_manager"]["ansible_fqdn"] }} {{ hostvars["wazuh_manager"]["ansible_hostname"] }}'
 
     # osquery role vars (merge)
     osquery_config:
       options:
         config_plugin: filesystem
         logger_plugin: filesystem
-        utc: 'true'
+        utc: "true"
       schedule:
         system_info:
           query: SELECT hostname, cpu_brand, physical_memory FROM system_info;
           interval: 3600
         high_load_average:
-          query: SELECT period, average, '70%' AS 'threshold' FROM load_average WHERE period
+          query:
+            SELECT period, average, '70%' AS 'threshold' FROM load_average WHERE period
             = '15m' AND average > '0.7';
           interval: 900
           description: Report if load charge is over 70 percent.
         low_free_memory:
-          query: SELECT memory_total, memory_free, CAST(memory_free AS real) / memory_total
+          query:
+            SELECT memory_total, memory_free, CAST(memory_free AS real) / memory_total
             AS memory_free_perc, '10%' AS threshold FROM memory_info WHERE memory_free_perc
             < 0.1;
           interval: 1800

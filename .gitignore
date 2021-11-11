@@ -17,3 +17,5 @@ roles/geerlingguy.ntp/
 .env
 
 # wazuh-local.ini
+
+opendistro/

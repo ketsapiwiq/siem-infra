@@ -1,48 +1,243 @@
 ---
-- hosts: 127.0.0.1
-  connection: local
-  gather_facts: no
-  tasks:
-    - name: launches a vm on the ansible host
-      command: 'VBoxManage startvm "vm_wazuh"'
-      register: startvm_result
-      failed_when: '"VBoxManage: error" in startvm_result.stderr and not "already locked by a session" in startvm_result.stderr'
-      changed_when: 'not "already locked by a session" in startvm_result.stderr'
+# - hosts: 127.0.0.1
+#   connection: local
+#   gather_facts: no
+#   tasks:
+# - name: launches a vm on the ansible host
+#   command: 'VBoxManage startvm "vm_wazuh"'
+#   register: startvm_result
+#   failed_when: '"VBoxManage: error" in startvm_result.stderr and not "already locked by a session" in startvm_result.stderr'
+#   changed_when: 'not "already locked by a session" in startvm_result.stderr'
 
-- hosts: wazuh_manager
+# Single node
+- hosts: manager
   # gather_facts: False
 
-  #   pre_tasks:
-  # # TODO: inject SSH key and disable password
-  #     - name: Check for Python
-  #       raw: test -e /usr/bin/python
-  #       changed_when: false
-  #       failed_when: false
-  #       register: check_python
-
-  #     - name: Install Python
-  #       raw: yum -y install python3
-  #       when: check_python.rc != 0
-  #   - name: Gathering facts
-  #       setup:
-
-  #   - name: Update apt packages
-  #     become: true
-  #     yum:
-  #       # upgrade: yes
-  #       update_cache: yes
-
+  become: yes
+  become_user: root
   roles:
-    - role: geerlingguy.ntp
-    - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
-    # Not working, package conflicts:
-    # - role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch
-    # - role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana
+    #   - role: geerlingguy.ntp
+    - role: "roles/wazuh-ansible/roles/opendistro/opendistro-elasticsearch"
+    - role: "roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager"
+    - role: "roles/wazuh-ansible/roles/wazuh/ansible-filebeat-oss"
+    - role: "roles/wazuh-ansible/roles/opendistro/opendistro-kibana"
+
+    #     - role: roles/ansible-role-osquery
+
+  #   roles:
+  #     - role: geerlingguy.swap
+  #     - role: roles/wazuh-ansible/roles/wazuh/ansible-filebeat
+  #       filebeat_output_elasticsearch_hosts: localhost:9200
+
+  #     - {
+  #         role: roles/wazuh-ansible/roles/elastic-stack/ansible-elasticsearch,
+  #         elasticsearch_network_host: "0.0.0.0",
+  #         single_node: true,
+  #       }
+  #     - {
+  #         role: roles/wazuh-ansible/roles/elastic-stack/ansible-kibana,
+  #         elasticsearch_network_host: "0.0.0.0",
+  #         elasticsearch_reachable_host: "localhost",
+  #       }
+
   vars:
-    elastic_stack_version: 7.7.1
-    elasticsearch_network_host: "0.0.0.0"
-    elasticsearch_reachable_host: "localhost"
-    filebeat_output_elasticsearch_hosts: localhost:9200
+    #     swap_file_size_mb: "4096"
+    #     #     Xpack Security
+    #     # filebeat_xpack_security: true
+    #     # elasticsearch_xpack_security: true
+    #     # generate_CA: false
+    #     # elasticsearch_xpack_security_user: elastic
+    #     # elasticsearch_xpack_security_password: elastic_pass
+    #     # kibana_xpack_security: true,
+    # -----
+    #   elastic_stack_version: 7.7.1
+    #   elasticsearch_network_host: "0.0.0.0"
+    #   elasticsearch_reachable_host: "localhost"
+    #   filebeat_output_elasticsearch_hosts: localhost:9200
+    #   single_node: true
+    #   ntp_timezone: "Europe/Paris"
+    #   ntp_enabled: true
     single_node: true
-    ntp_timezone: "Europe/Paris"
-    ntp_enabled: true
+    minimum_master_nodes: 1
+    elasticsearch_node_master: true
+    elasticsearch_network_host: "192.168.33.10"
+    filebeat_node_name: node-1
+    filebeat_output_elasticsearch_hosts: "192.168.33.10"
+    ansible_ssh_user: vagrant
+    # ansible_ssh_private_key_file: /path/to/ssh/key.pem
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+    instances:
+      node1:
+        name: node-1 # Important: must be equal to elasticsearch_node_name.
+        ip: "192.168.33.10"
+  # ---
+  #   vars:
+  #     wazuh_manager_config:
+  #     # Debug mode: normally, wazuh-manager discards logs sent that don't trigger an alert
+  #       logall: 'yes'
+  #       # logall_json: 'no'
+
+  #       api:
+  #         https: 'yes'
+  #       vulnerability_detector:
+  #         enabled: "yes"
+  #         interval: "5m"
+  #         ignore_time: "10m"
+  #         run_on_start: "yes"
+  #         providers:
+  #           - enabled: "yes"
+  #             os:
+  #               # - 'trusty'
+  #               # - 'xenial'
+  #               - "bionic"
+  #             update_interval: "1h"
+  #             name: '"canonical"'
+  #           - enabled: "yes"
+  #             os:
+  #               # - 'wheezy'
+  #               - "stretch"
+  #               # - 'jessie'
+  #               # - 'buster'
+  #             update_interval: "1h"
+  #             name: '"debian"'
+  #           # - enabled: 'no'
+  #           #   update_from_year: '2010'
+  #           #   update_interval: '1h'
+  #           #   name: '"redhat"'
+  #           - enabled: "yes"
+  #             update_from_year: "2010"
+  #             update_interval: "1h"
+  #             name: '"nvd"'
+  #             # Supposedly outdated:
+  #           # - vuls:
+  #           #   disable: 'yes'
+  #           #   interval: '1d'
+  #           #   run_on_start: 'yes'
+  #           #   args:
+  #           #     - 'mincvss 5'
+  #           #     - 'antiquity-limit 20'
+  #           #     - 'updatenvd'
+  #           #     - 'nvd-year 2016'
+  #           #     - 'autoupdate'
+  #           # OSQuery manager
+  #       osquery:
+  #         disable: "no"
+  #         run_daemon: "yes"
+  #         log_path: "/var/log/osquery/osqueryd.results.log"
+  #         config_path: "/etc/osquery/osquery.conf"
+  #         ad_labels: "yes"
+
+  #     # osquery role vars (merge)
+  #     osquery_config:
+  #       options:
+  #         config_plugin: filesystem
+  #         logger_plugin: filesystem
+  #         utc: 'true'
+  #       packs:
+  #         osquery-monitoring: "/usr/share/osquery/packs/osquery-monitoring.conf"
+  #         incident-response: "/usr/share/osquery/packs/incident-response.conf"
+  #         it-compliance: "/usr/share/osquery/packs/it-compliance.conf"
+  #         vuln-management: "/usr/share/osquery/packs/vuln-management.conf"
+  #         hardware-monitoring: "/usr/share/osquery/packs/hardware-monitoring.conf"
+  #         ossec-rootkit: "/usr/share/osquery/packs/ossec-rootkit.conf"
+
+  # TODO: sysmon rules for powershell cmds
+  # https://documentation.wazuh.com/3.9/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html
+
+  # <rule id="100000" level="12">
+  #   <if_sid>4104</if_sid>
+  #   <description>Powershell command run</description>
+  # </rule>
+
+  # <group name="sysmon,">
+  #  <rule id="255000" level="12">
+  #  <if_group>sysmon_event1</if_group>
+  #  <field name="sysmon.image">\\powershell.exe||\\.ps1||\\.ps2</field>
+  #  <description>Sysmon - Event 1: Bad exe: $(sysmon.image)</description>
+  #  <group>sysmon_event1,powershell_execution,</group>
+  #  </rule>
+  # </group>
+  # {
+  #     "win": {
+  #         "system": {
+  #         "providerName": "MsiInstaller",
+  #         "eventID": "11707",
+  #         "level": "4",
+  #         "task": "0",
+  #         "keywords": "0x80000000000000",
+  #         "systemTime": "2019-04-03T10:47:39.000000000Z",
+  #         "eventRecordID": "12615",
+  #         "channel": "Application",
+  #         "computer": "pcname",
+  #         "severityValue": "INFORMATION",
+  #         "message": "Product: Dr. Memory -- Installation completed successfully."
+  #         },
+  #         "eventdata": {
+  #         "binary": "7B36373637354144362D314642302D344445312D394543462D3834393937353135303235457D",
+  #         "data": "Product: Dr. Memory -- Installation completed successfully."
+  #         }
+  #     }
+  # }
+
+  # This event can be filtered field by field in case an alert is desired to trigger when it occurs. In this use case, the filters used will be the provider name and the event ID, as follows:
+
+  # <rule id="60612" level="12">
+  #     <field name="win.system.providerName">MsiInstaller</field>
+  #     <field name="win.system.eventID">^11707$|^1033$</field>
+  # <description>Application Installed $(win.eventdata.data)</description>
+  # </rule>
+
+  # TODO:
+  # include play-level rules template file if exists:
+  #  src: "{{ vhost_template_file|default('vhost.conf.j2') }}"
+
+  # ---
+  pre_tasks:
+    # # TODO: inject SSH key and disable password
+    #     - name: Check for Python
+    #       raw: test -e /usr/bin/python
+    #       changed_when: false
+    #       failed_when: false
+    #       register: check_python
+
+    #     - name: Install Python
+    #       raw: yum -y install python3
+    #       when: check_python.rc != 0
+    #   - name: Gathering facts
+    #       setup:
+
+    - name: Update apt packages (Ubuntu)
+      apt:
+        # upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+      when: ansible_os_family == "Debian"
+#     - name: Update apt packages (CentOS)
+#       yum:
+#         # upgrade: yes
+#         update_cache: yes
+#       when: ansible_os_family == "RedHat"
+
+#     # due to ubuntu and ansible role, install and configure sudo for root
+#     - name: Install sudo
+#       apt:
+#         name: sudo
+#         state: present
+#       when: ansible_distribution == "Ubuntu"
+
+#     - name: Make sure we have a 'wheel' group
+#       group: name=wheel
+#         state=present
+#       when: ansible_distribution == "Ubuntu"
+
+#     - name: Add root user to group wheel
+#       user: name=root groups=wheel
+#       when: ansible_distribution == "Ubuntu"
+
+#     - name: Allow wheel group to have passwordless sudo
+#       lineinfile:
+#         dest: /etc/sudoers
+#         state: present
+#         regexp: "^%wheel"
+#         line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+#       when: ansible_distribution == "Ubuntu"

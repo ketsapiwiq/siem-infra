@@ -1,0 +1,6 @@
+---
+- name: restart osquery
+  service:
+    name: "{{ osquery.daemon }}"
+    state: restarted
+    sleep: 5

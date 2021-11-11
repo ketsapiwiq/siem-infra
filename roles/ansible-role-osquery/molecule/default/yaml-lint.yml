@@ -1,0 +1,10 @@
+---
+extends: default
+ignore: |
+  meta/
+  .gitlab-ci.yml
+  virtenv/
+rules:
+  line-length:
+    max: 200
+    level: warning

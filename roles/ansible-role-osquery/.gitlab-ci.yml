@@ -1,0 +1,42 @@
+stages:
+  - test
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip"
+
+cache:
+  paths:
+    - .pip/
+    - virtenv/
+
+before_script:
+  - pip3.6 install virtualenv
+  - virtualenv virtenv
+  - source virtenv/bin/activate
+
+molecule-centos:
+  variables:
+    MOLECULE_DISTRO: "centos7"
+    MOLECULE_DOCKER_COMMAND: /usr/lib/systemd/systemd
+  tags:
+    - testing
+  script:
+    - docker -v
+    - python -V
+    - pip install ansible molecule docker
+    - ansible --version
+    - molecule --version
+    - molecule test
+
+molecule-ubuntu:
+  variables:
+    MOLECULE_DISTRO: "ubuntu1604"
+  tags:
+    - testing
+  script:
+    - docker -v
+    - python -V
+    - pip install ansible molecule docker
+    - ansible --version
+    - molecule --version
+    - molecule test

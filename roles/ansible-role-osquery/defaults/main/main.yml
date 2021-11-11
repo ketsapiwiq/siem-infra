@@ -1,0 +1,13 @@
+---
+osquery:
+  daemon: "osqueryd"
+  version: "latest"
+  config_include_dir: "/etc/osquery"
+  systemctl_configs:
+    - name: fs.inotify.max_user_watches
+      value: 16384
+    - name: fs.inotify.max_user_instances
+      value: 256
+    - name: fs.inotify.max_queued_events
+      value: 32768
+  disable_auditd: true

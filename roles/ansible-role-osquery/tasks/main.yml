@@ -1,0 +1,108 @@
+---
+
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Add repository key
+  apt_key:
+    keyserver: "keyserver.ubuntu.com"
+    id: "1484120AC4E9F8A1A577AEEE97A80C63C9D8B80B"
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Add Server repository
+  apt_repository:
+    repo: 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure specific version of packages is installed.
+  apt:
+    name: "osquery={{ osquery.version}}"
+    state: present
+  when:
+    - "osquery.version != 'latest'"
+    - ansible_os_family == 'Debian'
+
+- name: Ensure latest version of packages is installed.
+  apt:
+    name: "osquery"
+    state: present
+  when:
+    - "osquery.version == 'latest'"
+    - ansible_os_family == 'Debian'
+
+- name: Add osquery
+  yum_repository:
+    name: osquery
+    description: osquery
+    baseurl: https://s3.amazonaws.com/osquery-packages/rpm/$basearch/
+    gpgkey: https://pkg.osquery.io/rpm/GPG
+    s3_enabled: true
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+- name: disable auditd
+  service:
+    name: auditd
+    state: stopped
+    enabled: false
+  ignore_errors: true
+  when: osquery.disable_auditd == true
+
+- name: install osquery latest
+  yum:
+    name: osquery
+    state: present
+  when:
+    - ansible_os_family == 'RedHat'
+    - "osquery.version == 'latest'"
+
+- name: install osquery version
+  yum:
+    name: "osquery={{ osquery.version }}"
+    state: present
+  when:
+    - ansible_os_family == 'RedHat'
+    - "osquery.version != 'latest'"
+
+- name: copy config file
+  copy:
+    dest: "{{ osquery.config_include_dir }}/osquery.conf"
+    content: "{{ osquery_config | to_nice_json }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart osquery
+
+- name: copy flags
+  copy:
+    src: osquery.flags
+    dest: /etc/osquery/osquery.flags
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart osquery
+
+- name: copy packs
+  copy:
+    src: packs/
+    dest: /etc/osquery/packs
+
+- name: configure systemctl for osquery
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: "^{{ item.name }}"
+    line: "{{ item.name }} = {{ item.value }}"
+  with_items: "{{ osquery.systemctl_configs }}"
+
+- name: Make sure osquery autostarts
+  service:
+    name: "{{ osquery.daemon }}"
+    enabled: true
+    state: started

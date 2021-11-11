@@ -1,0 +1,25 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: osquery
+  author: shamsalmon
+  description: Install and configure osquery
+  company: "FPS"
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.7
+  platforms:
+    - name: Ubuntu
+      versions:
+      - all
+    - name: Debian
+      versions:
+      - all
+  galaxy_tags:
+    - monitoring
+    - metrics
+    - logging
+    - security
+    - devopssec
+    - facebook
+    - osquery

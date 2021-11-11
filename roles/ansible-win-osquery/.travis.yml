@@ -1,0 +1,22 @@
+---
+language: python
+python: "2.7"
+before_install:
+ - ln -s ansible-win-osquery ../juju4.win_osquery
+install:
+  - sudo apt-get install libxml2-utils
+  - pip install ansible ansible-lint
+  - ansible --version
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+
+script:
+  - "echo \"localhost\" > inventory"
+
+  - "ansible-lint tasks/main.yml || true"
+
+# Check the role/playbook's syntax.
+  - "ansible-playbook -i inventory --syntax-check test/integration/default/default.yml"
+
+# Check osquery templates pack
+# not valid once we have jinja2 syntax...
+#  - "for f in templates/osquery-*.conf.j2; do echo \"== $f\"; egrep -v '//.*' $f | python -mjson.tool > /dev/null; done"

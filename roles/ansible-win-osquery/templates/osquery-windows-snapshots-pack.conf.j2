@@ -1,0 +1,264 @@
+{{ ansible_managed | comment('c') }}
+// https://osquery.io/docs/tables/#windows
+{
+  "platform": "windows",
+  "queries": {
+    "os_version": {
+      "query" : "select * from os_version;",
+{% if osquery_testing %}
+      "interval": "20",
+{% else %}
+      "interval": "{{ win_osquery_snapshot_interval }}",
+{% endif %}
+      "snapshot": true,
+      "description" : "A single row containing the operating system name and version."
+    },
+    "platform_info": {
+      "query" : "select * from platform_info;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Information about EFI/UEFI/ROM and platform/boot."
+    },
+    "system_info": {
+      "query" : "select * from system_info;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "System information for identification."
+    },
+    "win_appcompat_shims": {
+      "query" : "select * from appcompat_shims;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Info on Application Compatibility shims"
+    },
+{% if win_osquery_watch_autoexec %}
+    "win_autoexec": {
+      "query" : "select * from autoexec;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Aggregate of executables that will automatically execute on the target machine"
+    },
+{% endif %}
+    "win_bitlocker_info": {
+      "query": "select * from bitlocker_info;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description": "Retrieve bitlocker status of the machine."
+    },
+    "win_certificates": {
+      "query": "select * from certificates;",
+      "interval" : "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "platform": "windows",
+      "description": "Certificate Authorities installed in Keychains/ca-bundles"
+    },
+    "win_chocolatey_packages": {
+      "query": "select * from chocolatey_packages;",
+      "interval" : "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "platform": "windows",
+      "description": "Chocolatey packages installed in a system."
+    },
+    "win_crashes": {
+      "query": "select * from windows_crashes;",
+      "interval" : "{{ win_osquery_interval2 }}",
+      "platform": "windows",
+      "description": "Extracted information from Windows crash logs (Minidumps)."
+    },
+{% if win_osquery_watch_drivers %}
+    "win_drivers": {
+      "query" : "select * from drivers;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Lists all installed and loaded Windows Drivers"
+    },
+{% endif %}
+    "win_etc_hosts": {
+      "query": "select * from etc_hosts;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": "true",
+      "platform": "windows",
+      "description" : "Line-parsed hosts file."
+    },
+    "win_groups": {
+      "query": "select * from groups;",
+      "interval": {{ win_osquery_interval2 }},
+      "snapshot": "true",
+      "platform": "windows",
+      "description" : "Local system groups."
+    },
+    "win_heartbeat": {
+      "query": "select si.hostname, si.uuid, si.computer_name, up.total_seconds as uptime from system_info si, uptime up;",
+      "interval": 900,
+      "snapshot": "true",
+      "platform": "windows",
+      "description" : "System info and uptime as heartbeat"
+    },
+    "win_ie_extensions": {
+      "query" : "select * from ie_extensions;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": "true",
+      "description" : "Internet Explorer browser extensions"
+    },
+    "win_interface_addresses": {
+      "query" : "select * from interface_addresses;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": "true",
+      "description" : "Network interfaces and relevant metadata."
+    },
+    "win_kva_speculative_info": {
+      "query" : "select * from kva_speculative_info;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": "true",
+      "description" : "Display kernel virtual address and speculative execution information for the system."
+    },
+{% if win_osquery_watch_network %}
+    "win_listening_ports": {
+      "query": "select * from listening_ports;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "platform": "windows",
+      "description" : "Lists all the listening ports."
+    },
+    "win_listening_ports_signature": {
+      "query": "SELECT port_info.pid, port_info.family, port_info.protocol, port_info.port, port_info.address, process.name, process.path, authenticode.result AS authenticode FROM listening_ports AS port_info LEFT JOIN processes AS process ON port_info.pid = process.pid LEFT JOIN signature AS authenticode ON process.path = authenticode.path",
+      "interval": {{ win_osquery_snapshot_interval }},
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Lists all the listening ports with their signature status."
+    },
+{% endif %}
+    "win_patches": {
+      "query" : "select * from patches;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Lists all the patches applied. Note: This does not include patches applied via MSI or downloaded from Windows Update (e.g. Service Packs)."
+    },
+{% if win_osquery_watch_process %}
+    "win_process": {
+      "query": "select * from processes;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "platform": "windows",
+      "description" : "list processes."
+    },
+    "win_process_signatures": {
+      "query": "SELECT process.pid, process.path, authenticode.result FROM processes as process LEFT JOIN signature AS authenticode ON process.path = authenticode.path;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "platform": "windows",
+      "description" : "list processes with their signature status."
+    },
+{% endif %}
+    "win_programs": {
+      "query" : "select * from programs;",
+      "interval": "{{ win_osquery_snapshot_interval2 }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "list products as they are installed by Windows Installer."
+    },
+{% if win_osquery_watch_registry_snapshot %}
+    "win_registry": {
+      "query" : "select * from registry;",
+      "interval": "{{ win_osquery_snapshot_interval2 }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "All of the Windows registry hives"
+    },
+{% endif %}
+{% if win_osquery_watch_schtasks %}
+    "win_scheduled_tasks": {
+      "query" : "select * from scheduled_tasks;",
+      "interval": "{{ win_osquery_snapshot_interval2 }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Lists all of the tasks in the Windows Task Scheduler"
+    },
+{% endif %}
+{% if win_osquery_watch_services %}
+    "win_services": {
+      "query" : "select * from services;",
+      "interval": "{{ win_osquery_snapshot_interval2 }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Lists all installed Windows Services"
+    },
+{% endif %}
+    "win_shared_resources": {
+      "query" : "select * from shared_resources;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Displays shared resources on a computer system running Windows"
+    },
+{% if win_osquery_watch_startups %}
+    "win_startup_items": {
+      "query": "select * from startup_items;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "platform": "windows",
+      "description" : "Applications and binaries set as user/login startup items."
+    },
+{% endif %}
+    "win_user_groups": {
+      "query": "select * from user_groups;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Local system user group relationships."
+    },
+    "win_user_groups2": {
+      "query": "select u.uid, u.gid, u.username, u.uuid, g.groupname, g.group_sid from users u, user_groups ug, groups g where u.uid = ug.uid and ug.gid = g = g.gid;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Local system user group relationships."
+    },
+    "win_users": {
+      "query": "select * from users;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "Local user accounts (including domain accounts that have logged on locally (Windows))."
+{% if win_osquery_watch_wmi %}
+    },
+    "win_wmi_cli_event_consumers": {
+      "query" : "select filter,consumer,query,command_line_template,wcec.name from wmi_cli_event_consumers wcec left outer join wmi_filter_consumer_binding wcb on consumer = wcec.relative_path left outer join wmi_event_filters wef on wef.relative_path = wcb.filter;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "WMI CommandLineEventConsumer, which can be used for persistance on Windows"
+    },
+    "win_wmi_event_filters": {
+      "query": "select * from wmi_event_filters;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description": "Lists WMI event filters"
+    },
+    "win_wmi_filter_consumer_binding": {
+      "query": "select * from wmi_filter_consumer_binding;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description": "Lists the relationship between event consumers and filters"
+    },
+    "win_wmi_script_event_consumers": {
+      "query" : "select filter,consumer,query,scripting_engine,script_file_name,script_text,wsec.name from wmi_script_event_consumers wsec left outer join wmi_filter_consumer_binding wcb on consumer = wsec.relative_path left outer join wmi_event_filters wef on wef.relative_path = wcb.filter;",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "platform": "windows",
+      "snapshot": true,
+      "description" : "WMI ActiveScriptEventConsumer, which can be used for persistance on Windows"
+{% endif %}
+    }
+  }
+}

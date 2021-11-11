@@ -1,0 +1,19 @@
+{{ ansible_managed | comment('c') }}
+// https://www.fireeye.com/blog/threat-research/2019/01/bypassing-network-restrictions-through-rdp-tunneling.html
+{
+  "platform": "windows",
+  "queries": {
+    "win_registry_putty": {
+      "query" : "select * from registry where path like 'HKEY_CURRENT_USER\\SOFTWARE\\SimonTatham\\PuTTY%'",
+      "interval": "{{ win_osquery_interval2 }}",
+      "platform": "windows",
+      "description" : "List PuTTY and Plink session information"
+    },
+    "win_registry_netsh_portproxy": {
+      "query" : "select * from registry where path like 'HKEY_CURRENT_USER\\CurrentControlSet\\Services\\PortProxy%'",
+      "interval": "{{ win_osquery_interval2 }}",
+      "platform": "windows",
+      "description" : "List PortProxy configuration with netsh"
+    }
+  }
+}

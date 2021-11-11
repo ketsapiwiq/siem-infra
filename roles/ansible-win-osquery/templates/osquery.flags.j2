@@ -1,0 +1,44 @@
+{{ ansible_managed | comment }}
+# manual test
+# > osqueryd.exe --S --logger_stderr --logtostderr --config_path="{{ win_osquery_dir | regex_replace('^c:', '') }}\osquery.conf" --pidfile="{{ win_osquery_dir | regex_replace('^c:', '') }}\osqueryd.pid" {% if win_osquery_fim or win_osquery_fetch_evtlogs_list %}--disable_events=false {% else %}--disable_events=true {% endif %}{% if win_osquery_fim %}--enable_ntfs_event_publisher {% endif %}{% if not win_osquery_fetch_evtlogs_list %}--disable_tables=windows_events {% endif %}{% if win_osquery_fleetserver is defined and win_osquery_fleetserver|string %}--allow_unsafe --config_plugin=tls --config_tls_endpoint=/api/v1/osquery/config --config_tls_refresh=10 --disable_distributed=false --distributed_interval=10 --distributed_plugin=tls --distributed_tls_max_attempts=3 --distributed_tls_read_endpoint=/api/v1/osquery/distributed/read --distributed_tls_write_endpoint=/api/v1/osquery/distributed/write --enroll_secret_path="{{ win_osquery_secret_path | default('c:\path\to\file\containing\secret.txt') }}" --enroll_tls_endpoint=/api/v1/osquery/enroll --host_identifier={{ ansible_host }} --logger_plugin=tls --logger_tls_endpoint=/api/v1/osquery/log --logger_tls_period=10 --tls_hostname={{ win_osquery_fleetserver | default('tls.endpoint.server.com') }}:{{ win_osquery_fleetserver_port | default('8412') }} --tls_server_certs="{{ win_osquery_cert_path | default('c:\ProgramData\osquery\certfile.crt') }}" --verbose=true {% endif %}
+
+#
+--config_path="{{ win_osquery_dir | regex_replace('^c:', '') }}\osquery.conf" \
+--pidfile="{{ win_osquery_dir | regex_replace('^c:', '') }}\osqueryd.pid" \
+{% if win_osquery_fim or win_osquery_fetch_evtlogs_list %}
+--disable_events=false \
+{% else %}
+--disable_events=true \
+{% endif %}
+{% if win_osquery_fim %}
+--enable_ntfs_event_publisher \
+{% endif %}
+{% if not win_osquery_fetch_evtlogs_list %}
+--disable_tables=windows_events \
+{% endif %}
+{% if win_osquery_fleetserver is defined and win_osquery_fleetserver|string %}
+--allow_unsafe \
+--config_plugin=tls \
+--config_tls_endpoint=/api/v1/osquery/config \
+--config_tls_refresh=10 \
+--disable_distributed=false \
+--distributed_interval=10 \
+--distributed_plugin=tls \
+--distributed_tls_max_attempts=3 \
+--distributed_tls_read_endpoint=/api/v1/osquery/distributed/read \
+--distributed_tls_write_endpoint=/api/v1/osquery/distributed/write \
+--enroll_secret_path="{{ win_osquery_secret_path | default('c:\path\to\file\containing\secret.txt') }}" \
+--enroll_tls_endpoint=/api/v1/osquery/enroll \
+--host_identifier={{ ansible_host }} \
+--logger_plugin=tls \
+--logger_tls_endpoint=/api/v1/osquery/log \
+--logger_tls_period=10 \
+--tls_hostname={{ win_osquery_fleetserver | default('tls.endpoint.server.com') }}:{{ win_osquery_fleetserver_port | default('8412') }} \
+--tls_server_certs="{{ win_osquery_cert_path | default('c:\ProgramData\osquery\certfile.crt') }}" \
+{% endif %}
+{% if win_osquery_extra_flags %}
+{% for f in win_osquery_extra_flags %}
+{{ f }} \
+{% endfor %}
+{% endif %}
+--verbose=true

@@ -1,0 +1,34 @@
+---
+
+- name: ensure profiling dependencies are present - chocolatey
+  win_chocolatey:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python
+    - git
+
+- name: ensure profiling dependencies are present - pip
+#  pip:
+#    name: "{{ item }}"
+#    state: present
+  win_command: "pip install {{ item }}"
+  with_items:
+    - psutil
+
+# https://github.com/tivrobo/ansible-win_git ?
+- name: get source repository for profiling tools
+#  git:
+#    repo: https://github.com/facebook/osquery.git
+#    dest: "{{ win_osquery_dir }}\\gitrepo"
+  win_command: git.exe clone https://github.com/facebook/osquery.git "{{ win_osquery_dir }}\\gitrepo"
+
+- name: profiling
+  win_command: >
+    python.exe .\\tools\\analysis\\profile.py --config {{ osquery_profiling_conf }} \
+        --shell "{{ win_osquery_dir }}\\osqueryi.exe" --count 1 --rounds 4
+  args:
+    chdir: "{{ win_osquery_dir }}\\gitrepo"
+  changed_when: false
+  register: perf
+- debug: var=perf.stdout_lines

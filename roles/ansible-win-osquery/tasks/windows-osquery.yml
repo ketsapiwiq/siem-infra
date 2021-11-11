@@ -1,0 +1,248 @@
+---
+
+## https://osquery.io/downloads/
+## https://www.facebook.com/notes/protect-the-graph/introducing-osquery-for-windows/1775110322729111/
+
+## FIXME! "ERROR: Exception calling "RemovableAccessRule" with "1" argument(s):
+##      "Some or all identity references could not be translated."
+## https://github.com/facebook/osquery/blob/e8045f1dd33ee4ed3a424ba70e71c1ff07b2a6e9/tools/provision/\
+#       chocolatey/osquery_utils.ps1#L36
+## https://msdn.microsoft.com/en-us/library/windows/desktop/aa379649(v=vs.85).aspx
+- name: Install osquery package with chocolatey
+  win_chocolatey:
+    name: osquery
+## ansible 2.1+. better after configuration
+#    install_args: "/InstallService"
+#  ignore_errors: true
+  when: not win_osquery_url
+
+- name: Install osquery from url
+  win_package:
+    path: "{{ win_osquery_url }}"
+    product_id: '{A00B7823-A9A3-4577-A804-A07C43765AFD}'
+    state: present
+  when: win_osquery_url != ''
+  register: pkg_result
+  until: pkg_result is success
+
+- name: Include osquery fim pack
+  set_fact:
+    win_osquery_upload_packs: "{{ win_osquery_upload_packs + [ 'osquery-fim-pack' ] }}"
+  when: win_osquery_fim
+
+- name: update osquery windows packs
+  win_template:
+    src: "{{ item }}.conf.j2"
+    dest: "{{ win_osquery_dir }}\\packs\\{{ item }}.conf"
+    backup: yes
+  with_items: "{{ win_osquery_upload_packs }}"
+  register: conf1
+  notify:
+    - Restart osqueryd
+    - Restart osqueryd - script
+
+- include: palantir.yml
+  when: win_osquery_palantir|bool
+
+- block:
+    - name: Check if have osquery secret file
+      win_stat:
+        path: "{{ win_osquery_secret_path }}"
+      register: secretf
+    - name: Ensure secret directory exists
+      win_file:
+        dest: "{{ win_osquery_secret_path | win_dirname }}"
+        state: directory
+    - name: Create osquery secret file
+      win_lineinfile:
+        path: "{{ win_osquery_secret_path }}"
+        regex: '^.*'
+        line: "{{ win_osquery_secret }}"
+        state: present
+        create: yes
+      when: (not secretf.stat.exists or secretf.stat.size == 0) and win_osquery_secret
+    - name: Restrict permissions for Users on osquery secret
+      win_acl:
+        path: "{{ item.p }}"
+        user: "{{ item.u }}"
+        rights: "{{ item.r }}"
+        type: "{{ item.t }}"
+        state: "{{ item.s }}"
+        inherit: 'ContainerInherit, ObjectInherit'
+        propagation: 'None'
+      with_items:
+        - { p: "{{ win_osquery_secret_path }}", u: 'Users', r: 'read,write', t: allow, s: absent }
+        - { p: "{{ win_osquery_secret_path }}", u: 'Administrators', r: 'read,write', t: allow, s: present }
+  when: win_osquery_secret is defined and win_osquery_secret and win_osquery_secret_path is defined and win_osquery_secret_path|string
+
+- block:
+    - name: Copy Fleet server certificate
+      win_copy:
+        src: "{{ win_osquery_cert_orchestrator_path }}"
+        dest: "{{ win_osquery_cert_path }}"
+  when: win_osquery_cert_push
+
+- name: Configure osqueryd
+  win_template:
+    src: "{{ win_osquery_template }}"
+    dest: "{{ win_osquery_dir }}\\osquery.conf"
+  register: conf2
+  notify:
+    - Restart osqueryd
+    - Restart osqueryd - script
+
+- name: Configure osqueryd flags
+  win_template:
+    src: "{{ win_osquery_flags_template }}"
+    dest: "{{ win_osquery_dir }}\\osquery.flags"
+  register: conf3
+  notify:
+    - Restart osqueryd
+    - Restart osqueryd - script
+
+- name: update osqueryd.exe path
+  win_template:
+    src: manage-osqueryd.ps1.j2
+    dest: "{{ win_osquery_dir }}\\manage-osqueryd.ps1"
+    backup: yes
+
+- name: Remove permissions inheritance on osquery directories
+  win_acl_inheritance:
+    path: "{{ win_osquery_dir }}"
+    reorganize: yes
+    state: absent
+
+- name: Restrict permissions for Users on osquery directories
+  win_acl:
+    path: "{{ item.p }}"
+    user: "{{ item.u }}"
+    rights: "{{ item.r }}"
+    type: "{{ item.t }}"
+    state: "{{ item.s }}"
+    inherit: 'ContainerInherit, ObjectInherit'
+    propagation: 'None'
+  with_items:
+    - { p: "{{ win_osquery_dir }}", u: 'Users', r: write, t: allow, s: absent }
+    - { p: "{{ win_osquery_dir }}\\certs", u: 'Users', r: write, t: allow, s: absent }
+    - { p: "{{ win_osquery_dir }}\\log", u: 'Users', r: 'read,write', t: allow, s: absent }
+    - { p: "{{ win_osquery_dir }}\\packs", u: 'Users', r: write, t: allow, s: absent }
+
+# https://github.com/facebook/osquery/pull/3887
+# https://osquery.readthedocs.io/en/stable/installation/install-windows/#enabling-windows-event-log-support
+- name: Check if osquery windows event log installed
+  win_stat:
+    path: "{{ win_osquery_dir }}\\osquery_man_installed"
+  register: osquerymaninstalled
+- block:
+    - name: fixme! missing file in msi
+      win_copy:
+        src: osquery.man
+        dest: "{{ win_osquery_dir }}\\osquery.man"
+      when: win_osquery_url != ''
+
+    - name: Enable Windows Event Log support
+      win_command: "wevtutil im \"{{ win_osquery_dir }}\\osquery.man\""
+      notify:
+        - Restart osqueryd
+        - Restart osqueryd - script
+
+#    - name: Check WINEVT osquery channel configuration
+#      win_command: "wevtutil gl \"osquery\""
+#      changed_when: false
+#      register: evtosquery
+
+# FIXME! not working
+    - name: WINEVT osquery Channel Event Log size review
+      win_regedit:
+        key: "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Channels\\osquery"
+        value: MaxSize
+        datatype: dword
+        data: "{{ win_eventlog_maxsize }}"
+#      when: "'maxsize: {{ win_eventlog_maxsize }}' not in evtosquery.stdout"
+
+    - name: WINEVT Channels Event Log retention review
+      win_regedit:
+        key: "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Channels\\osquery"
+        value: Retention
+        datatype: dword
+        data: "{{ win_eventlog_retention }}"
+#      when: "'retention: false' not in evtosquery.stdout"
+
+#    - name: Check WINEVT osquery channel configuration
+#      win_command: "wevtutil gl \"osquery\""
+#      changed_when: false
+
+#    - name: WINEVT osquery channel configuration - wevtutil
+#      win_command: "wevtutil sl \"osquery\" /ms:{{ win_eventlog_maxsize }} /rt:false /ab:false"
+#      when: "'maxsize: {{ win_eventlog_maxsize }}' not in evtosquery.stdout"
+
+#    - name: Check WINEVT osquery channel configuration
+#      win_command: "wevtutil gl \"osquery\""
+#      changed_when: false
+
+    - name: Add task marker
+      win_file:
+        path: "{{ win_osquery_dir }}\\osquery_man_installed"
+        state: touch
+  when:
+    - not osquerymaninstalled.stat.exists
+    - "'windows_event_log' in win_osquery_logger_plugin"
+- name: Check if osquery windows event log status disabled
+  win_stat:
+    path: "{{ win_osquery_dir }}\\osquery_man_uninstalled"
+  register: osquerymanimported
+- block:
+    - name: Disable Windows Event Log support
+      win_command: "wevtutil um \"{{ win_osquery_dir }}\\osquery.man\""
+      notify:
+        - Restart osqueryd
+        - Restart osqueryd - script
+    - name: Add task marker
+      win_file:
+        path: "{{ win_osquery_dir }}\\osquery_man_uninstalled"
+        state: touch
+  when:
+    - not osquerymaninstalled.stat.exists
+    - "'windows_event_log' not in win_osquery_logger_plugin"
+
+- block:
+# https://github.com/ansible/ansible/issues/35661
+    - name: validate osqueryd config
+      win_command: >
+        "{{ win_osquery_dir }}\\osqueryi.exe" --config_path "{{ win_osquery_dir }}\\osquery.conf" \
+            --config_check --verbose
+      changed_when: false
+    - name: Install and start osqueryd service
+#      win_shell: "%ProgramData%\\osquery\\manage-osqueryd.ps1 -install -start"
+      win_shell: "{{ item }}"
+      with_items:
+#        - "PowerShell.exe -ExecutionPolicy Bypass -File c:\\ProgramData\\osquery\\manage-osqueryd.ps1 -install"
+        - "PowerShell.exe -ExecutionPolicy Bypass -File \"{{ win_osquery_dir }}\\manage-osqueryd.ps1\" -install
+            -args '--flagfile \"{{ win_osquery_dir | regex_replace('^c:', '') }}\\osquery.flags\"'"
+        - "PowerShell.exe -ExecutionPolicy Bypass -File \"{{ win_osquery_dir }}\\manage-osqueryd.ps1\" -start"
+      ignore_errors: true
+  when: win_osqueryd_service_enable|bool and (conf1.changed or conf2.changed or conf3.changed)
+- block:
+    - name: Uninstall and stop osqueryd service
+      win_shell: "{{ item }}"
+      with_items:
+        - "PowerShell.exe -ExecutionPolicy Bypass -File \"{{ win_osquery_dir }}\\manage-osqueryd.ps1\" -uninstall"
+        - "PowerShell.exe -ExecutionPolicy Bypass -File \"{{ win_osquery_dir }}\\manage-osqueryd.ps1\" -stop"
+      ignore_errors: true
+  when: not win_osqueryd_service_enable|bool
+
+- name: Wait for osquery.db path to exist after first start
+  pause:
+    seconds: 5
+
+- name: Restrict permissions for Users on osquery directories - post first start
+  win_acl:
+    path: "{{ item.p }}"
+    user: "{{ item.u }}"
+    rights: "{{ item.r }}"
+    type: "{{ item.t }}"
+    state: "{{ item.s }}"
+    inherit: 'None'
+    propagation: 'InheritOnly'
+  with_items:
+    - { p: "{{ win_osquerydb_dir }}", u: 'Users', r: write, t: allow, s: absent }

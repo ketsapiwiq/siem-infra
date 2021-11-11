@@ -1,0 +1,125 @@
+{{ ansible_managed | comment('c') }}
+{
+  "platform": "windows",
+  "queries": {
+
+// https://www.chromium.org/administrators/policy-list-3
+// change
+    "AutoFill": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name like 'AutoFill%';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check AutoFill"
+    },
+    "BlockThirdPartyCookies": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'BlockThirdPartyCookies';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check BlockThirdPartyCookies"
+    },
+    "BrowserGuestModeEnabled": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'BrowserGuestModeEnabled';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check BrowserGuestModeEnabled"
+    },
+    "CookiesAllowedForUrls": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome\\CookiesAllowedForUrls';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check CookiesAllowedForUrls"
+    },
+    "DownloadRestrictions": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'DownloadRestrictions';",
+{% if osquery_testing %}
+      "interval": "20",
+{% else %}
+      "interval": "{{ win_osquery_interval }}",
+{% endif %}
+      "description" : "Check DownloadRestrictions"
+    },
+    "ExtensionInstallBlacklist": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome\\ExtensionInstallBlacklist';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check ExtensionInstallBlacklist"
+    },
+    "ExtensionInstallWhitelist": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome\\ExtensionInstallWhitelist';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check ExtensionInstallWhitelist"
+    },
+    "PasswordManagerEnabled": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'PasswordManagerEnabled';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check PasswordManagerEnabled"
+    },
+    "SafeBrowsingEnabled": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'SafeBrowsingEnabled';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check SafeBrowsingEnabled"
+    },
+    "AutoUpdateCheckPeriodMinutes": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Update' and name = 'AutoUpdateCheckPeriodMinutes';",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Check AutoUpdateCheckPeriodMinutes"
+    },
+
+// snapshots
+    "AutoFill-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name like 'AutoFill%';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check AutoFill"
+    },
+    "BlockThirdPartyCookies-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'BlockThirdPartyCookies';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check BlockThirdPartyCookies"
+    },
+    "BrowserGuestModeEnabled-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'BrowserGuestModeEnabled';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check BrowserGuestModeEnabled"
+    },
+    "CookiesAllowedForUrls-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome\\CookiesAllowedForUrls';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check CookiesAllowedForUrls"
+    },
+    "DownloadRestrictions-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'DownloadRestrictions';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check DownloadRestrictions"
+    },
+    "ExtensionInstallBlacklist-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome\\ExtensionInstallBlacklist';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check ExtensionInstallBlacklist"
+    },
+    "ExtensionInstallWhitelist-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome\\ExtensionInstallWhitelist';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check ExtensionInstallWhitelist"
+    },
+    "PasswordManagerEnabled-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'PasswordManagerEnabled';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check PasswordManagerEnabled"
+    },
+    "SafeBrowsingEnabled-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Chrome' and name = 'SafeBrowsingEnabled';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check SafeBrowsingEnabled"
+    },
+    "AutoUpdateCheckPeriodMinutes-snapshots": {
+      "query" : "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Google\\Update' and name = 'AutoUpdateCheckPeriodMinutes';",
+      "interval": "{{ win_osquery_snapshot_interval }}",
+      "snapshot": true,
+      "description" : "Check AutoUpdateCheckPeriodMinutes"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{{ ansible_managed | comment('c') }}
+// https://blog.kolide.com/how-to-set-up-windows-file-integrity-monitoring-using-osquery-and-kolide-d5ac09db046b
+// https://blog.trailofbits.com/2020/03/16/real-time-file-monitoring-on-windows-with-osquery/
+{
+  "platform": "windows",
+  "queries": {
+
+    "ntfs_journal_events": {
+      "query" : "select * from ntfs_journal_events",
+      "interval": "{{ win_osquery_interval }}",
+      "description" : "Track time/action changes to files specified in configuration data."
+    }
+
+  }
+}
+

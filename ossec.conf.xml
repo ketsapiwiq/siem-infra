@@ -6,173 +6,171 @@
 -->
 
 <ossec_config>
-  <client>
-    <server>
-      <address>192.168.56.102</address>
-      <port>1514</port>
-      <protocol>udp</protocol>
-    </server>
-    <notify_time>10</notify_time>
-    <time-reconnect>60</time-reconnect>
-    <auto_restart>yes</auto_restart>
-    <crypto_method>aes</crypto_method>
-  </client>
+    <client>
+        <server>
+            <address>192.168.33.10</address>
+            <port>1514</port>
+            <protocol>tcp</protocol>
+        </server>
+        <notify_time>10</notify_time>
+        <time-reconnect>60</time-reconnect>
+        <auto_restart>yes</auto_restart>
+        <crypto_method>aes</crypto_method>
+    </client>
 
-  <client_buffer>
-    <!-- Agent buffer options -->
-    <disabled>no</disabled>
-    <queue_size>5000</queue_size>
-    <events_per_second>500</events_per_second>
-  </client_buffer>
+    <client_buffer>
+        <!-- Agent buffer options -->
+        <disabled>no</disabled>
+        <queue_size>5000</queue_size>
+        <events_per_second>500</events_per_second>
+    </client_buffer>
 
-  <rootcheck>
-    <disabled>no</disabled>
-    <windows_apps>./shared/win_applications_rcl.txt</windows_apps>
-    <windows_malware>./shared/win_malware_rcl.txt</windows_malware>
+    <rootcheck>
+        <disabled>no</disabled>
+        <windows_apps>./shared/win_applications_rcl.txt</windows_apps>
+        <windows_malware>./shared/win_malware_rcl.txt</windows_malware>
 
-  </rootcheck>
-
-
-
-  <wodle name=\"cis-cat\">
-    <disabled>yes</disabled>
-    <timeout>1800</timeout>
-    <interval>1d</interval>
-    <scan-on-start>yes</scan-on-start>
-    <java_path>\\\\server\\jre\\bin\\java.exe</java_path>
-    <ciscat_path>C:\\cis-cat</ciscat_path>
-  </wodle>
-
-  <!-- Osquery integration -->
-  <wodle name=\"osquery\">
-    <disabled>yes</disabled>
-    <run_daemon>yes</run_daemon>
-    <bin_path>C:\\Program Files\\osquery\\osqueryd</bin_path>
-    <log_path>C:\\Program Files\\osquery\\log\\osqueryd.results.log</log_path>
-    <config_path>C:\\Program Files\\osquery\\osquery.conf</config_path>
-    <add_labels>yes</add_labels>
-  </wodle>
-
-  <!-- System inventory -->
-  <wodle name=\"syscollector\">
-    <disabled>False</disabled>
-    <interval>1h</interval>
-    <scan_on_start>yes</scan_on_start>
-    <hardware>yes</hardware>
-    <os>yes</os>
-    <network>yes</network>
-    <packages>yes</packages>
-    <ports all=\"no\">yes</ports>
-    <processes>yes</processes>
-  </wodle>
-
-  <sca>
-    <enabled>yes</enabled>
-    <scan_on_start>yes</scan_on_start>
-    <interval>12h</interval>
-    <skip_nfs>yes</skip_nfs>
-  </sca>
+    </rootcheck>
 
 
-  <!-- Directories to check  (perform all possible verifications) -->
-  <syscheck>
-    <disabled>no</disabled>
-    <frequency>43200</frequency>
+
+    <wodle name=\"cis-cat\">
+        <disabled>yes</disabled>
+        <timeout>1800</timeout>
+        <interval>1d</interval>
+        <scan-on-start>yes</scan-on-start>
+        <java_path>\\\\server\\jre\\bin\\java.exe</java_path>
+        <ciscat_path>C:\\cis-cat</ciscat_path>
+    </wodle>
+
+    <!-- Osquery integration -->
+    <wodle name=\"osquery\">
+        <disabled>yes</disabled>
+        <run_daemon>yes</run_daemon>
+        <bin_path>C:\\Program Files\\osquery\\osqueryd</bin_path>
+        <log_path>C:\\Program Files\\osquery\\log\\osqueryd.results.log</log_path>
+        <config_path>C:\\Program Files\\osquery\\osquery.conf</config_path>
+        <add_labels>yes</add_labels>
+    </wodle>
+
+    <!-- System inventory -->
+    <wodle name=\"syscollector\">
+        <disabled>no</disabled>
+        <interval>10m</interval>
+        <scan_on_start>yes</scan_on_start>
+        <hardware>yes</hardware>
+        <os>yes</os>
+        <network>yes</network>
+        <packages>yes</packages>
+        <ports all=\"no\">yes</ports>
+        <processes>yes</processes>
+    </wodle>
+
+    <sca>
+        <enabled>yes</enabled>
+        <scan_on_start>yes</scan_on_start>
+        <interval>12h</interval>
+        <skip_nfs>yes</skip_nfs>
+    </sca>
+
 
     <!-- Directories to check  (perform all possible verifications) -->
+    <syscheck>
+        <disabled>no</disabled>
+        <frequency>43200</frequency>
 
-    <!-- Files/directories to ignore -->
+        <!-- Directories to check  (perform all possible verifications) -->
 
-    <!-- File types to ignore -->
-    <ignore type=\"sregex\">.log$|.swp$</ignore>
+        <!-- Files/directories to ignore -->
 
-
-
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\batfile</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\cmdfile</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\comfile</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\exefile</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\piffile</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\AllFilesystemObjects</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\Folder</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Classes\\Protocols</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Policies</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Security</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Internet Explorer</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\KnownDLLs</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\winreg</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce</windows_registry>
-    <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\URL</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon</windows_registry>
-    <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Active Setup\\Installed Components</windows_registry>
-
-    <registry_ignore>HKEY_LOCAL_MACHINE\\Security\\Policy\\Secrets</registry_ignore>
-    <registry_ignore>HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users</registry_ignore>
-    <registry_ignore type=\"sregex\">\\Enum$</registry_ignore>
-
-    <!-- Frequency for ACL checking (seconds) -->
-    <windows_audit_interval>60</windows_audit_interval>
-
-      <!-- Nice value for Syscheck module -->
-    <process_priority>10</process_priority>
-
-    <!-- Maximum output throughput -->
-    <max_eps>100</max_eps>
-
-    <!-- Database synchronization settings -->
-    <synchronization>
-      <enabled>yes</enabled>
-      <interval>5m</interval>
-      <max_interval>1h</max_interval>
-      <max_eps>10</max_eps>
-    </synchronization>
-  </syscheck>
+        <!-- File types to ignore -->
+        <ignore type=\"sregex\">.log$|.swp$</ignore>
 
 
 
-  <!-- Files to monitor (localfiles) -->
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\batfile</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\cmdfile</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\comfile</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\exefile</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\piffile</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\AllFilesystemObjects</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Classes\\Folder</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Classes\\Protocols</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Policies</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Security</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Internet Explorer</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\KnownDLLs</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\winreg</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce</windows_registry>
+        <windows_registry>HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\URL</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon</windows_registry>
+        <windows_registry arch=\"both\">HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Active Setup\\Installed Components</windows_registry>
+
+        <registry_ignore>HKEY_LOCAL_MACHINE\\Security\\Policy\\Secrets</registry_ignore>
+        <registry_ignore>HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users</registry_ignore>
+        <registry_ignore type=\"sregex\">\\Enum$</registry_ignore>
+
+        <!-- Frequency for ACL checking (seconds) -->
+        <windows_audit_interval>60</windows_audit_interval>
+
+        <!-- Nice value for Syscheck module -->
+        <process_priority>10</process_priority>
+
+        <!-- Maximum output throughput -->
+        <max_eps>100</max_eps>
+
+        <!-- Database synchronization settings -->
+        <synchronization>
+            <enabled>yes</enabled>
+            <interval>5m</interval>
+            <max_interval>1h</max_interval>
+            <max_eps>10</max_eps>
+        </synchronization>
+    </syscheck>
+
+
+
+    <!-- Files to monitor (localfiles) -->
 
 
 
 
-  <localfile>
-      <log_format>eventlog</log_format>
-      <location>Application</location>
-  </localfile>
+    <localfile>
+        <log_format>eventlog</log_format>
+        <location>Application</location>
+    </localfile>
 
-  <localfile>
-      <log_format>eventchannel</log_format>
-      <location>Security</location>
-      <query>Event/System[EventID != 5145 and EventID != 5156 and EventID != 5447 and EventID != 4656 and EventID != 4658 and EventID != 4663 and EventID != 4660 and EventID != 4670 and EventID != 4690 and EventID != 4703 and EventID != 4907]</query>
-  </localfile>
+    <localfile>
+        <log_format>eventchannel</log_format>
+        <location>Security</location>
+        <query>Event/System[EventID != 5145 and EventID != 5156 and EventID != 5447 and EventID != 4656 and EventID != 4658 and EventID != 4663 and EventID != 4660 and EventID != 4670 and EventID != 4690 and EventID != 4703 and EventID != 4907]</query>
+    </localfile>
 
-  <localfile>
-      <log_format>eventlog</log_format>
-      <location>System</location>
-  </localfile>
+    <localfile>
+        <log_format>eventlog</log_format>
+        <location>System</location>
+    </localfile>
 
-  <localfile>
-      <log_format>syslog</log_format>
-      <location>active-response\\active-responses.log</location>
-  </localfile>
+    <localfile>
+        <log_format>syslog</log_format>
+        <location>active-response\\active-responses.log</location>
+    </localfile>
 
 
-  <active-response>
-    <disabled>no</disabled>
-    <ca_store>wpk_root.pem</ca_store>
-    <ca_verification>yes</ca_verification>
-  </active-response>
+    <active-response>
+        <disabled>no</disabled>
+        <ca_store>wpk_root.pem</ca_store>
+        <ca_verification>yes</ca_verification>
+    </active-response>
 
-  <logging>
-    <log_format>plain</log_format>
-  </logging>
+    <logging>
+        <log_format>plain</log_format>
+    </logging>
 
 </ossec_config>
-"
-}

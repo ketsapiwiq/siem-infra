@@ -4,14 +4,17 @@
 #   name: Gather facts from manager
 #   tasks: [ ]
 
-- hosts: wazuh_agent
+- hosts: linux_agent
+  become: true
   pre_tasks:
     - name: Update apt packages
-      # become: true
       apt:
         # upgrade: yes
         update_cache: yes
         cache_valid_time: 86400 #One day
+    - name: show ossec conf templating results
+      debug:
+        msg: "{{ lookup('template', './roles/wazuh-ansible/roles/wazuh/ansible-wazuh-agent/templates/var-ossec-etc-ossec-agent.conf.j2') }}"
 
   # - debug:
   #     msg: "{{ groups }}"
@@ -36,15 +39,14 @@
 
   vars:
     # hostvars[inventory_hostname] is sous-entendu
-    wazuh_manager_ip: "{{ hostvars[inventory_hostname].groups.wazuh_manager[0] }}"
+    wazuh_manager_ip: "192.168.33.10"
     wazuh_managers:
       - address: "{{ wazuh_manager_ip }}"
         port: 1514
-        protocol: udp
+        protocol: tcp
         api_port: 55000
         api_proto: "https"
-        api_user: foo
-        api_pass: bar
+        api_user: ansible
     wazuh_agent_authd:
       # authd_pass: 'foobar'
       registration_address: "{{ wazuh_manager_ip }}"
@@ -53,6 +55,8 @@
       ssl_agent_ca: null
       ssl_auto_negotiate: "no"
       ssl_agent_cert: null
+      max_retries: 5
+      retry_interval: 5
     wazuh_agent_config:
       syscollector:
         disable: "no"

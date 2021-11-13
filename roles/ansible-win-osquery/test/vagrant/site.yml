@@ -1,6 +1,0 @@
----
-
-- hosts: all
-  become_method: runas
-  roles:
-    - juju4.win-osquery

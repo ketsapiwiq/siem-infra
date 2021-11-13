@@ -153,10 +153,10 @@ Vagrant.configure("2") do |config|
                     #  "ansible_winrm_server_cert_validation" => "ignore",
                     #  "ansible_connection" => "psrp",
                     #  "ansible_psrp_transport" => "basic",
-                    #  "ansible_psrp_cert_validation" => "ignore"
-               
+                    #  "ansible_psrp_cert_validation" => "ignore"    
+                }
+                
             ansible.playbook = "wazuh-agent-win.yml"
-            }
                     
         end
         

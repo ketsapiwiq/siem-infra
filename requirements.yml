@@ -7,4 +7,4 @@
 # see also apolloclark repo
 - src: https://github.com/shamsalmon/ansible-role-osquery
 # For Windows
-- src: https://github.com/juju4/ansible-win-osquery
+- src: https://github.com/ketsapiwiq/ansible-win-osquery

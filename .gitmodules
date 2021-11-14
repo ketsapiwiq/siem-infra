@@ -1,6 +1,6 @@
 [submodule "roles/wazuh-ansible"]
 	path = roles/wazuh-ansible
 	url = https://github.com/wazuh/wazuh-ansible
-[submodule "roles/juju4.win-osquery"]
-	path = roles/juju4.win-osquery
-	url = https://github.com/juju4/ansible-win-osquery
+[submodule "roles/ansible-win-osquery"]
+	path = roles/ansible-win-osquery
+	url = https://github.com/ketsapiwiq/ansible-win-osquery

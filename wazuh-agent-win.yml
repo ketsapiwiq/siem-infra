@@ -2,21 +2,25 @@
 
   roles:
     - name: wazuh-ansible/roles/wazuh/ansible-wazuh-agent
-      tags: wazuh
-    - name: juju4.win-osquery
-      tags: osquery
+      tags:
+        - wazuh
+        - windows
+    - name: ansible-win-osquery
+      tags:
+        - osquery
+        - windows
+    - name: win-filebeat-osquery
+      tags:
+        - osquery
+        - windows
+        - filebeat
 
   vars_files:
     - wazuh-agent-win-vars.yml
     - osquery-win-vars.yml
 
   tasks:
-    - name: import filebeat osquery tasks
-      import_tasks: win-filebeat-osquery.yml
-      tags:
-        - filebeat
-        - osquery
-
     - name: import extra tasks
       import_tasks: win-client-extra.yml
-      tags: extra
+      tags:
+        - extra

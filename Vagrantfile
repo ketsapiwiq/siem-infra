@@ -155,7 +155,8 @@ Vagrant.configure("2") do |config|
                     #  "ansible_psrp_transport" => "basic",
                     #  "ansible_psrp_cert_validation" => "ignore"    
                 }
-                
+            ansible.raw_arguments = ['--diff', '-vv']
+            
             ansible.playbook = "wazuh-agent-win.yml"
                     
         end

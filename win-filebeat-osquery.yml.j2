@@ -1,0 +1,31 @@
+# Module: osquery
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-osquery.html
+
+- module: osquery
+  result:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+    # TODO: variabilize with log_path_win
+    var.paths: ["C:\\Program Files\\osquery\\log\\osqueryd.results.log*"]
+
+    # If true, all fields created by this module are prefixed with
+    # `osquery.result`. Set to false to copy the fields in the root
+    # of the document. The default is true.
+    #var.use_namespace: true
+
+    # bin_path_win: 'C:\Program Files\osquery\osqueryd'
+    # log_path_win: 'C:\Program Files\osquery\log\osqueryd.results.log'
+    # config_path_win: 'C:\Program Files\osquery\osquery.conf'
+########################################################################################
+# Filters are used to transform and modify Osquery logs
+########################################################################################
+# filter {
+#    if [type] == "osquery_json" {
+#       date {
+#         match => [ "unixTime", "UNIX" ]
+#       }
+#    }
+# }

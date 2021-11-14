@@ -59,3 +59,30 @@ See https://github.com/ansible/ansible/issues/32499
 - https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection/index.html#vulnerability-detection
 - https://documentation.wazuh.com/current/user-manual/capabilities/osquery.html
 - https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html
+
+## TODO
+
+### Known issues
+
+- Troubleshoot Windows osquery bugs
+
+### Features
+
+- Add Powershell command execution logging and alerting
+- Setup X-pack auth config + HTTPS/TLS certs everywhere
+- [Active response](https://documentation.wazuh.com/3.13/user-manual/capabilities/active-response/how-it-works.html#when-is-an-active-response-triggered)
+
+## Possible evolutions
+
+- add minotring of node modules security output recurring task (npm audit)
+- integrate other tools/sysinternals into ansible playbooks: https://docs.microsoft.com/en-us/sysinternals/downloads/rootkit-revealer
+  - with a script to suspend all processes and dump RAM and disk (sysinternals) as an action response
+- VirusTotal API / [Malice](https://github.com/maliceio/malice) / Cuckoo integration
+- Suricata integration
+- Multi-cluster / load-balanced Ansible playbook
+  - K8s/Helm ?
+
+### Low priority
+
+- WAF / CI/CD for application security?
+- more robust osquery configuration for Linux? https://github.com/palantir/osquery-configuration

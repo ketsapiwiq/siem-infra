@@ -1,0 +1,75 @@
+# OSQuery Role
+# See roles/juju4.win-osquery/defaults/main.yml
+# And config given by wazuh (originally json)
+
+# # osquery windows role vars
+
+win_osquery_fim: false
+win_osquery_logger_plugin: filesystem
+win_osquery_logger_path: '{{ win_osquery_dir }}\log'
+
+win_osquery_upload_packs:
+  - osquery-windows-pack
+  - osquery-windows-snapshots-pack
+  - osquery-msoffice-pack
+  - osquery-chrome-pack
+  - osquery-windows-tunneling-pack
+  - performance-metrics-extras
+  - windows-hardening
+  # Attempt
+  # - "osquery-monitoring"
+  # - "it-compliance"
+  # - "vuln-management"
+  # - "hardware-monitoring"
+  # - unwanted-chrome-extensions
+win_osquery_packs:
+  - windows-hardening
+
+  # normally there:
+
+  # osquery-monitoring: "/usr/share/osquery/packs/osquery-monitoring.conf"
+  # it-compliance: "/usr/share/osquery/packs/it-compliance.conf"
+  # vuln-management: "/usr/share/osquery/packs/vuln-management.conf"
+
+  # not found
+
+  # - "osquery-monitoring"
+  # - "it-compliance"
+  # - "vuln-management"
+  # - "hardware-monitoring"
+  # - unwanted-chrome-extensions
+
+  - "osquery-windows-pack"
+  - "osquery-windows-snapshots-pack"
+  - osquery-msoffice-pack
+  - osquery-chrome-pack
+  - osquery-windows-tunneling-pack
+
+  # buggy
+  # - "incident-response"
+  # - windows-attacks
+  # - performance-metrics-extras
+win_osquery_palantir: true
+win_osquery_packs_palantir:
+  - performance-metrics
+  - security-tooling-checks
+  - windows-application-security
+  - windows-compliance
+  - windows-registry-monitoring
+
+win_osquery_database_path: 'C:\ProgramData\osquery\osquery.db'
+
+win_osquery_watch_drivers: true
+win_osquery_watch_services: true
+win_osquery_watch_startups: true
+win_osquery_watch_schtasks: true
+
+## ?
+# osquery_testing: false
+## profiling?
+osquery_profiling: false
+# full config?
+# osquery_profiling_conf: "{{ win_osquery_dir }}\\osquery.conf"
+# osquery_profiling_conf: c:\ProgramData\osquery\osquery.conf
+# osquery_profiling_conf: "{{ win_osquery_dir }}\\packs\\osquery-windows-pack.conf"
+# Loaded dashboards

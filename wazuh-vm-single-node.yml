@@ -138,6 +138,23 @@
         hardware-monitoring: "/usr/share/osquery/packs/hardware-monitoring.conf"
         ossec-rootkit: "/usr/share/osquery/packs/ossec-rootkit.conf"
 
+  # TODO: include more? needed on manager node?
+  #   - windows-attacks
+  #   - "osquery-windows-pack"
+  #   - "osquery-windows-snapshots-pack"
+  #   - osquery-msoffice-pack
+  #   - osquery-chrome-pack
+  #   - osquery-windows-tunneling-pack
+  #   - performance-metrics-extras
+  #   # from palantir - only if above variable true
+  # win_osquery_packs_palantir:
+  #   - performance-metrics
+  #   - security-tooling-checks
+  #   - windows-application-security
+  #   - windows-compliance
+  #   - windows-registry-monitoring
+
+  # ## ?
   # TODO: sysmon rules for powershell cmds
   # https://documentation.wazuh.com/3.9/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html
 
@@ -190,51 +207,38 @@
 
   # ---
   pre_tasks:
-    # # TODO: inject SSH key and disable password
-    #     - name: Check for Python
-    #       raw: test -e /usr/bin/python
-    #       changed_when: false
-    #       failed_when: false
-    #       register: check_python
-
-    #     - name: Install Python
-    #       raw: yum -y install python3
-    #       when: check_python.rc != 0
-    #   - name: Gathering facts
-    #       setup:
-
     - name: Update apt packages (Ubuntu)
       apt:
         # upgrade: yes
         update_cache: yes
         cache_valid_time: 86400 #One day
       when: ansible_os_family == "Debian"
-#     - name: Update apt packages (CentOS)
-#       yum:
-#         # upgrade: yes
-#         update_cache: yes
-#       when: ansible_os_family == "RedHat"
+    - name: Update apt packages (CentOS)
+      yum:
+        # upgrade: yes
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
 
-#     # due to ubuntu and ansible role, install and configure sudo for root
-#     - name: Install sudo
-#       apt:
-#         name: sudo
-#         state: present
-#       when: ansible_distribution == "Ubuntu"
+    # # due to ubuntu and ansible role, install and configure sudo for root
+    # - name: Install sudo
+    #   apt:
+    #     name: sudo
+    #     state: present
+    #   when: ansible_distribution == "Ubuntu"
 
-#     - name: Make sure we have a 'wheel' group
-#       group: name=wheel
-#         state=present
-#       when: ansible_distribution == "Ubuntu"
+    # - name: Make sure we have a 'wheel' group
+    #   group: name=wheel
+    #     state=present
+    #   when: ansible_distribution == "Ubuntu"
 
-#     - name: Add root user to group wheel
-#       user: name=root groups=wheel
-#       when: ansible_distribution == "Ubuntu"
+    # - name: Add root user to group wheel
+    #   user: name=root groups=wheel
+    #   when: ansible_distribution == "Ubuntu"
 
-#     - name: Allow wheel group to have passwordless sudo
-#       lineinfile:
-#         dest: /etc/sudoers
-#         state: present
-#         regexp: "^%wheel"
-#         line: "%wheel ALL=(ALL) NOPASSWD: ALL"
-#       when: ansible_distribution == "Ubuntu"
+    # - name: Allow wheel group to have passwordless sudo
+    #   lineinfile:
+    #     dest: /etc/sudoers
+    #     state: present
+    #     regexp: "^%wheel"
+    #     line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+    #   when: ansible_distribution == "Ubuntu"

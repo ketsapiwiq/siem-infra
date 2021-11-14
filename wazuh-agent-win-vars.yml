@@ -1,0 +1,76 @@
+wazuh_manager_ip: "192.168.33.10"
+wazuh_managers:
+  - address: "{{ wazuh_manager_ip }}"
+    port: 1514
+    protocol: tcp
+    api_port: 55000
+    api_proto: "http"
+    api_user: foo
+    api_pass: bar
+wazuh_agent_authd:
+  # authd_pass: 'foobar'
+  registration_address: "{{ wazuh_manager_ip }}"
+  enable: true
+  port: 1515
+  ssl_agent_ca: null
+  ssl_auto_negotiate: "no"
+  ssl_agent_cert: null
+wazuh_winagent_config:
+  check_md5: False
+wazuh_agent_config:
+  syscollector:
+    disable: "no"
+    os: "yes"
+    # Needed for windows
+    win_hotfixes: "yes"
+    interval: 10m
+    scan_on_start: "yes"
+  ### OSQUERY
+  # Wazuh OSquery config
+  osquery:
+    scan_on_start: "yes"
+    disable: "no"
+    run_daemon: "yes"
+    bin_path_win: 'C:\Program Files\osquery\osqueryd'
+    log_path_win: 'C:\Program Files\osquery\log\osqueryd.results.log'
+    config_path_win: 'C:\Program Files\osquery\osquery.conf'
+    add_labels: "yes"
+
+  # Sysmon events
+  localfiles:
+    windows:
+      # - format: 'eventchannel'
+      #   location: 'Microsoft-Windows-Sysmon/Operational'
+      - format: "eventchannel"
+        location: "Microsoft-Windows-Powershell/Operational"
+        # location: 'Windows PowerShell'
+        query: "Event/System[EventID=4104 or EventID=4100 or EventID=4103]"
+      - format: "eventlog"
+        location: "Microsoft-Windows-Powershell/Operational"
+        # location: 'Windows PowerShell'
+        # query: 'Event/System[EventID=4104 or EventID=4100 or EventID=4103]'
+      - format: "eventlog"
+        # location: 'Microsoft-Windows-Powershell/Operational'
+        location: "Windows PowerShell"
+        # query: 'Event/System[EventID=4104 or EventID=4100 or EventID=4103]'
+        # query: 'Event/System[EventID=4104]'
+        # 4100 and 4103 should be helpful too
+    # - format: 'eventchannel'
+    #   location: 'Microsoft-Windows-Powershell/Operational'
+    #   query: 'Event/System[EventID=4103]'
+# https://documentation.wazuh.com/3.9/user-manual/capabilities/log-data-collection/how-to-collect-wlogs.html
+# https://static1.squarespace.com/static/552092d5e4b0661088167e5c/t/59c1814829f18782e24f1fe2/1505853768977/Windows+PowerShell+Logging+Cheat+Sheet+ver+Sept+2017+v2.1.pdf
+# Windows 8.1and Server 2012and above:oPowerShellversion 3 and4, “Windows PowerShell” log-Event ID’s 400, 500, 501 and 800o“Microsoft-Windows-PowerShell/Operational”log –Event ID4104Windows 7 and Server 2008 and above:oPowerShellversion 5, “Windows PowerShell” log-Event ID’s 200, 400, 500and 501o“Microsoft-Windows-PowerShell/Operational”log –Event ID4100, 4103 and 410
+
+# {% for localfile in wazuh_agent_config.localfiles.windows %}
+
+#   <localfile>
+#       <log_format>{{ localfile.format }}</log_format>
+#   {% if localfile.format == 'eventchannel' %}
+#       <location>{{ localfile.location }}</location>
+#       <query>{{ localfile.query}}</query>
+#   {% else %}
+#       <location>{{ localfile.location }}</location>
+#   {% endif %}
+#   </localfile>
+#   {% endfor %}

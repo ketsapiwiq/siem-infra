@@ -28,9 +28,8 @@ wazuh_agent_config:
   ### OSQUERY
   # Wazuh OSquery config
   osquery:
-    scan_on_start: "yes"
     disable: "no"
-    run_daemon: "yes"
+    run_daemon: "no"
     bin_path_win: 'C:\Program Files\osquery\osqueryd'
     log_path_win: 'C:\Program Files\osquery\log\osqueryd.results.log'
     config_path_win: 'C:\Program Files\osquery\osquery.conf'

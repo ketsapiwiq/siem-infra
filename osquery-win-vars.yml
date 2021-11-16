@@ -5,8 +5,7 @@
 # # osquery windows role vars
 
 win_osquery_fim: false
-win_osquery_logger_plugin: filesystem
-win_osquery_logger_path: '{{ win_osquery_dir }}\log'
+win_osquery_logger_plugin: "filesystem"
 
 win_osquery_upload_packs:
   - osquery-windows-pack
@@ -22,8 +21,21 @@ win_osquery_upload_packs:
   # - "vuln-management"
   # - "hardware-monitoring"
   # - unwanted-chrome-extensions
+
 win_osquery_packs:
   - windows-hardening
+  # enabled:
+  # | windows-hardening              |
+  # | osquery-windows-pack           |
+  # | osquery-windows-snapshots-pack |
+  # | osquery-msoffice-pack          |
+  # | osquery-chrome-pack            |
+  # | osquery-windows-tunneling-pack |
+  # | performance-metrics            |
+  # | security-tooling-checks        |
+  # | windows-application-security   |
+  # | windows-compliance             |
+  # | windows-registry-monitoring
 
   # normally there:
 
@@ -56,8 +68,6 @@ win_osquery_packs_palantir:
   - windows-application-security
   - windows-compliance
   - windows-registry-monitoring
-
-win_osquery_database_path: 'C:\ProgramData\osquery\osquery.db'
 
 win_osquery_watch_drivers: true
 win_osquery_watch_services: true

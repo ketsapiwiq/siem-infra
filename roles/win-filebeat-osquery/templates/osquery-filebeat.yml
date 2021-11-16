@@ -1,0 +1,52 @@
+# Wazuh - Filebeat configuration file
+
+# Wazuh - Filebeat configuration file
+filebeat.modules:
+  - module: wazuh
+    alerts:
+      enabled: true
+    archives:
+      enabled: false
+setup.template.json.enabled: true
+setup.template.json.path: "/etc/filebeat/wazuh-template.json"
+setup.template.json.name: "wazuh"
+setup.template.overwrite: true
+setup.ilm.enabled: false
+setup.dashboards.enabled: true
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+  # Kibana Host
+  headers:
+    securitytenant: global
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  host: "192.168.33.10:5601"
+  username: admin
+  password: changeme
+  protocol: "https"
+  ssl.enabled: true
+  ssl.verification_mode: "none"
+
+# Send events directly to Elasticsearch
+output.elasticsearch:
+  hosts: "192.168.33.10"
+
+  username: admin
+  password: changeme
+  protocol: https
+  ssl.certificate_authorities:
+    - /etc/pki/filebeat/root-ca.pem
+  ssl.certificate: "/etc/pki/filebeat/node-1.pem"
+  ssl.key: "/etc/pki/filebeat/node-1.key"
+# Optional. Send events to Logstash instead of Elasticsearch
+#output.logstash.hosts: ["YOUR_LOGSTASH_SERVER_IP:5000"]

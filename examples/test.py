@@ -63,7 +63,13 @@ def poll_feed(url, feedname, username, password):
 # Example command-line usage
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) < 3:         print "usage: taxii.py url feedname [username] [password]"         sys.exit(-1)     url = sys.argv[1]     feedname = sys.argv[2]     username, password = None, None     if len(sys.argv) >= 5:
+    if len(sys.argv) < 3:
+        print "usage: taxii.py url feedname [username] [password]"
+        sys.exit(-1)
+    url = sys.argv[1]
+    feedname = sys.argv[2] 
+    username, password = None, None
+    if len(sys.argv) >= 5:
         username = sys.argv[3]
         password = sys.argv[4]
 

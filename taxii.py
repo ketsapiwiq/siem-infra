@@ -43,9 +43,10 @@ def _taxii_req(url, feedname, username, password):
 
     # Add some headers to the request and return it
     if username is not None and password is not None:
+        login = '%s:%s' % (username, password)
+        message = base64.b64encode(login.replace('\n', '').encode("ascii"))
         req.add_header('Authorization', 'Basic %s' % 
-                       base64.b64encode('%s:%s' % 
-                       (username, password)).replace('\n', ''))
+                       message)
     req.add_header('Content-Type', 'application/xml')
     req.add_header('User-Agent', 'TAXII Client Application')
     req.add_header('Accept', 'application/xml')

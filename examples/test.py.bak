@@ -1,6 +1,6 @@
 
-import urllib.request, urllib.error, urllib.parse
-from urllib.parse import urlparse
+import urllib2
+from urlparse import urlparse
 # We'll use ElementTree to parse the XML as it's a simple binding which ships with Python
 import xml.etree.ElementTree as ET
 # These are used to help with HTTP basic auth and generate random message IDs, respectively
@@ -39,12 +39,12 @@ def _taxii_req(url, feedname, username, password):
     ET.SubElement(pp, 'Content_Binding', {'binding_id': 'urn:stix.mitre.org:xml:1.1.1'})
 
     # Create an HTTP request with our XML as the POST data
-    req = urllib.request.Request(url, ET.tostring(xmldata))
+    req = urllib2.Request(url, ET.tostring(xmldata))
 
     # Add some headers to the request and return it
     if username is not None and password is not None:
         req.add_header('Authorization', 'Basic %s' % 
-                       base64.b64encode('%s:%s' % 
+                       base64.encodestring('%s:%s' % 
                        (username, password)).replace('\n', ''))
     req.add_header('Content-Type', 'application/xml')
     req.add_header('User-Agent', 'TAXII Client Application')
@@ -57,14 +57,14 @@ def _taxii_req(url, feedname, username, password):
 # Function to poll a TAXII feed. Returns a list of CybOXObject instances
 def poll_feed(url, feedname, username, password):
     return [CybOXObject(x, url) for x in
-            ET.fromstring(urllib.request.urlopen(_taxii_req(url, feedname, username, password)).read())
+            ET.fromstring(urllib2.urlopen(_taxii_req(url, feedname, username, password)).read())
             .findall('.//{http://cybox.mitre.org/cybox-2}Object')]
 
 # Example command-line usage
 if __name__ == '__main__':
     import sys
     if len(sys.argv) < 3:
-        print("usage: taxii.py url feedname [username] [password]")
+        print "usage: taxii.py url feedname [username] [password]"
         sys.exit(-1)
     url = sys.argv[1]
     feedname = sys.argv[2] 
@@ -75,5 +75,5 @@ if __name__ == '__main__':
 
     for obj in poll_feed(url, feedname, username, password):
         if obj.hashes:
-            print("%s: %s" % (obj.url, obj.hashes))
+            print "%s: %s" % (obj.url, obj.hashes)
 
